@@ -5,7 +5,9 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -26,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
     private Button btnAttack;
     private Button btnMove;
     private Button btnInventory;
-    private Button btnSearch;
 
     private Button btnMoveForward;
     private Button btnMoveBack;
@@ -41,6 +42,13 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout mainMenuContainer;
     private LinearLayout moveMenuContainer;
     private LinearLayout inventoryMenuContainer;
+    private TextView subtitleText;
+    private ProgressBar hpBar;
+    private ProgressBar manaBar;
+    private TextView hpValue;
+    private TextView manaValue;
+    private GridLayout minimapGrid;
+    private GameEngine engine;
 
     private UiMode currentMode = null;
 
@@ -70,13 +78,18 @@ public class MainActivity extends AppCompatActivity {
         mainMenuContainer = findViewById(R.id.mainMenuContainer);
         moveMenuContainer = findViewById(R.id.moveMenuContainer);
         inventoryMenuContainer = findViewById(R.id.inventoryMenuContainer);
+        subtitleText = findViewById(R.id.subtitleText);
+        hpBar = findViewById(R.id.hpBar);
+        manaBar = findViewById(R.id.manaBar);
+        hpValue = findViewById(R.id.hpValue);
+        manaValue = findViewById(R.id.manaValue);
+        minimapGrid = findViewById(R.id.minimapGrid);
 
         btnHelp = findViewById(R.id.btnHelp);
         btnLook = findViewById(R.id.btnLook);
         btnAttack = findViewById(R.id.btnAttack);
         btnMove = findViewById(R.id.btnMove);
         btnInventory = findViewById(R.id.btnInventory);
-        btnSearch = findViewById(R.id.btnSearch);
 
         btnMoveForward = findViewById(R.id.btnMoveForward);
         btnMoveBack = findViewById(R.id.btnMoveBack);
@@ -87,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         btnInventoryBack = findViewById(R.id.btnInventoryBack);
 
         // Создаём игровой движок и парсер
-        GameEngine engine = new GameEngine();
+        engine = new GameEngine();
         parser = new CommandParser(engine);
 
         btnHelp.setOnClickListener(v -> {
@@ -114,13 +127,6 @@ public class MainActivity extends AppCompatActivity {
             appendAction("ИНВЕНТАРЬ");
             appendLog("Инвентарь пока не реализован");
             renderMenu(UiMode.INVENTORY);
-        });
-
-        btnSearch.setOnClickListener(v -> {
-            animateButtonPress(v);
-            appendAction("ПОИСК");
-            appendLog("Вы осматриваете комнату...");
-            appendLog(parser.handle("look"));
         });
 
         btnMoveForward.setOnClickListener(v -> {
@@ -152,7 +158,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         appendLog("Добро пожаловать в Arcane Frontier");
+        appendLog(parser.handle("look"));
         renderMenu(UiMode.MAIN);
+        updateUiFromEngine();
     }
 
     private void appendLog(String text) {
@@ -167,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
         appendAction(action);
         String result = parser.handle(command);
         appendLog(result);
+        updateUiFromEngine();
     }
 
     private void addLogEntry(String text, boolean isPlayer) {
@@ -250,5 +259,70 @@ public class MainActivity extends AppCompatActivity {
     private int dpToPx(int dp) {
         float density = getResources().getDisplayMetrics().density;
         return Math.round(dp * density);
+    }
+
+    private void updateUiFromEngine() {
+        if (engine == null) return;
+
+        Player player = engine.getPlayer();
+
+        hpBar.setMax(player.getMaxHealth());
+        hpBar.setProgress(player.getHealth());
+        manaBar.setMax(player.getMaxMana());
+        manaBar.setProgress(player.getMana());
+
+        hpValue.setText(player.getHealth() + "/" + player.getMaxHealth());
+        manaValue.setText(player.getMana() + "/" + player.getMaxMana());
+
+        Floor floor = engine.getCurrentFloor();
+        subtitleText.setText("Этаж " + floor.getIndex() + ": " + floor.getName());
+
+        renderMinimap(engine.getCurrentFloorGrid());
+    }
+
+    private void renderMinimap(Room[][] grid) {
+        if (grid == null || engine == null) return;
+
+        int rows = grid.length;
+        int cols = grid[0].length;
+
+        minimapGrid.removeAllViews();
+        minimapGrid.setRowCount(rows);
+        minimapGrid.setColumnCount(cols);
+
+        Room current = engine.getCurrentRoom();
+
+        for (int y = 0; y < rows; y++) {
+            for (int x = 0; x < cols; x++) {
+                Room room = grid[y][x];
+                View cell = new View(this);
+
+                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+                params.width = dpToPx(20);
+                params.height = dpToPx(20);
+                params.setMargins(dpToPx(1), dpToPx(1), dpToPx(1), dpToPx(1));
+                params.rowSpec = GridLayout.spec(y);
+                params.columnSpec = GridLayout.spec(x);
+                cell.setLayoutParams(params);
+
+                if (room == null) {
+                    cell.setBackgroundResource(R.drawable.bg_minimap_empty);
+                } else if (room == current) {
+                    cell.setBackgroundResource(R.drawable.bg_minimap_current);
+                } else if (room.isBossRoom() && room.isBossRevealed() && !room.isDiscovered()) {
+                    cell.setBackgroundResource(R.drawable.bg_minimap_boss_revealed);
+                } else if (!room.isDiscovered()) {
+                    cell.setBackgroundResource(R.drawable.bg_minimap_unknown);
+                } else if (room.isBossRoom()) {
+                    cell.setBackgroundResource(R.drawable.bg_minimap_boss);
+                } else if (room.isStartRoom()) {
+                    cell.setBackgroundResource(R.drawable.bg_minimap_start);
+                } else {
+                    cell.setBackgroundResource(R.drawable.bg_minimap_discovered);
+                }
+
+                minimapGrid.addView(cell);
+            }
+        }
     }
 }

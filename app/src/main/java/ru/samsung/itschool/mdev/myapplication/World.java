@@ -2,7 +2,9 @@ package ru.samsung.itschool.mdev.myapplication;
 
 public class World {
 
-    private Room startRoom;
+    private Floor currentFloor;
+    private int currentFloorIndex = 0;
+    private final Floor[] floors = new Floor[3];
 
     public World() {
         generate();
@@ -10,28 +12,31 @@ public class World {
 
     private void generate() {
 
-        Room room1 = new Room("Вы в тёмной комнате.");
-        Room room2 = new Room("Вы на узком коридоре.");
-        Room room3 = new Room("Вы в большой пещере.");
-        Room room4 = new Room("Вы у выхода наружу.");
+        floors[0] = new Floor(1, "Руины арканистов");
+        floors[1] = new Floor(2, "Затопленные галереи");
+        floors[2] = new Floor(3, "Небесная обсерватория");
 
-        // связываем комнаты
-        room1.setNorth(room2);
-        room2.setSouth(room1);
-
-        room2.setEast(room3);
-        room3.setWest(room2);
-
-        room3.setNorth(room4);
-        room4.setSouth(room3);
-
-        // добавляем врага
-        room3.setEnemy(new Enemy("Гоблин", 20, 5));
-
-        startRoom = room1;
+        currentFloor = floors[currentFloorIndex];
     }
 
     public Room getStartRoom() {
-        return startRoom;
+        return currentFloor.getStartRoom();
+    }
+
+    public Floor getCurrentFloor() {
+        return currentFloor;
+    }
+
+    public boolean hasNextFloor() {
+        return currentFloorIndex < floors.length - 1;
+    }
+
+    public boolean moveToNextFloor() {
+        if (!hasNextFloor()) {
+            return false;
+        }
+        currentFloorIndex++;
+        currentFloor = floors[currentFloorIndex];
+        return true;
     }
 }

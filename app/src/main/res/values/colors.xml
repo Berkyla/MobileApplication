@@ -11,4 +11,16 @@
     <color name="arcane_divider">#322D3A</color>
     <color name="arcane_ripple_purple">#338B5CF6</color>
     <color name="arcane_ripple_gold">#33D6B35A</color>
+    <color name="arcane_hp_red">#D46B6B</color>
+    <color name="arcane_hp_border">#FF8B8B</color>
+    <color name="arcane_mana_blue">#5DA3F5</color>
+    <color name="arcane_mana_border">#7BB6FF</color>
+    <color name="arcane_minimap_empty">#0E0C12</color>
+    <color name="arcane_minimap_unknown">#1A1720</color>
+    <color name="arcane_minimap_discovered">#3B3445</color>
+    <color name="arcane_minimap_current">#E8C26A</color>
+    <color name="arcane_minimap_boss">#A63838</color>
+    <color name="arcane_minimap_boss_revealed">#7A2C2C</color>
+    <color name="arcane_minimap_start">#3E7C50</color>
+    <color name="arcane_minimap_grid">#4B4557</color>
 </resources>

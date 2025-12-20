@@ -30,9 +30,124 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Зал древних рун"
+            android:text="Этаж 1"
             android:textColor="@color/arcane_text_secondary"
             android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/hpLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="HP"
+                    android:textColor="@color/arcane_text_secondary"
+                    android:textSize="13sp"
+                    android:layout_marginEnd="8dp" />
+
+                <ProgressBar
+                    android:id="@+id/hpBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="12dp"
+                    android:layout_weight="1"
+                    android:max="100"
+                    android:progress="50"
+                    android:progressDrawable="@drawable/progress_hp" />
+
+                <TextView
+                    android:id="@+id/hpValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="100/100"
+                    android:textColor="@color/arcane_text_secondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/manaLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MANA"
+                    android:textColor="@color/arcane_text_secondary"
+                    android:textSize="13sp"
+                    android:layout_marginEnd="8dp" />
+
+                <ProgressBar
+                    android:id="@+id/manaBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="12dp"
+                    android:layout_weight="1"
+                    android:max="100"
+                    android:progress="30"
+                    android:progressDrawable="@drawable/progress_mana" />
+
+                <TextView
+                    android:id="@+id/manaValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="50/50"
+                    android:textColor="@color/arcane_text_secondary"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Mini map -->
+    <LinearLayout
+        android:id="@+id/minimapCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_panel"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Миникарта этажа"
+            android:textColor="@color/arcane_text_secondary"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:letterSpacing="0.02"
+            android:paddingStart="4dp"
+            android:paddingBottom="6dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/arcane_divider" />
+
+        <GridLayout
+            android:id="@+id/minimapGrid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center_horizontal"
+            android:alignmentMode="alignBounds"
+            android:columnCount="5"
+            android:rowCount="5" />
     </LinearLayout>
 
     <!-- Adventure Log -->
@@ -170,24 +285,10 @@
 
                 <Button
                     android:id="@+id/btnInventory"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:background="@drawable/bg_button_arcane"
                     android:text="ИНВЕНТАРЬ"
-                    android:textColor="@color/arcane_text_primary" />
-
-                <View
-                    android:layout_width="8dp"
-                    android:layout_height="0dp" />
-
-                <Button
-                    android:id="@+id/btnSearch"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_button_arcane"
-                    android:text="ПОИСК"
                     android:textColor="@color/arcane_text_primary" />
             </LinearLayout>
         </LinearLayout>
