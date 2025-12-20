@@ -1,0 +1,207 @@
+diff --git a/app/src/main/java/ru/samsung/itschool/mdev/myapplication/MainActivity.java b/app/src/main/java/ru/samsung/itschool/mdev/myapplication/MainActivity.java
+index c4f0732acc7e356437605b85588219e479f8783d..3984a38e031309718bedc7e254c79d0fcf79aeca 100644
+--- a/app/src/main/java/ru/samsung/itschool/mdev/myapplication/MainActivity.java
++++ b/app/src/main/java/ru/samsung/itschool/mdev/myapplication/MainActivity.java
+@@ -1,59 +1,186 @@
+ package ru.samsung.itschool.mdev.myapplication;
+ 
+ import android.os.Bundle;
++import android.view.View;
+ import android.widget.Button;
+-import android.widget.EditText;
++import android.widget.LinearLayout;
++import android.widget.ScrollView;
+ import android.widget.TextView;
+ 
+ import androidx.activity.EdgeToEdge;
+ import androidx.appcompat.app.AppCompatActivity;
+ import androidx.core.graphics.Insets;
+ import androidx.core.view.ViewCompat;
+ import androidx.core.view.WindowInsetsCompat;
+ 
+ public class MainActivity extends AppCompatActivity {
+ 
+     private TextView gameLog;
+-    private EditText commandInput;
+-    private Button sendButton;
++    private ScrollView scrollView;
++
++    private Button btnHelp;
++    private Button btnLook;
++    private Button btnAttack;
++    private Button btnMove;
++    private Button btnInventory;
++    private Button btnSearch;
++
++    private Button btnMoveForward;
++    private Button btnMoveBack;
++    private Button btnMoveLeft;
++    private Button btnMoveRight;
++    private Button btnReturnFromMove;
++
++    private Button btnInventoryBack;
+ 
+     private CommandParser parser;
+ 
++    private LinearLayout mainMenuContainer;
++    private LinearLayout moveMenuContainer;
++    private LinearLayout inventoryMenuContainer;
++
++    private enum UiMode {
++        MAIN,
++        MOVE,
++        INVENTORY
++    }
++
+     @Override
+     protected void onCreate(Bundle savedInstanceState) {
+         super.onCreate(savedInstanceState);
+         EdgeToEdge.enable(this);
+         setContentView(R.layout.activity_main);
+ 
+         // Edge-to-edge обработка
+         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+             return insets;
+         });
+ 
+         // Подключение элементов интерфейса
++        scrollView = findViewById(R.id.scrollView);
+         gameLog = findViewById(R.id.gameLog);
+-        commandInput = findViewById(R.id.commandInput);
+-        sendButton = findViewById(R.id.sendButton);
++
++        mainMenuContainer = findViewById(R.id.mainMenuContainer);
++        moveMenuContainer = findViewById(R.id.moveMenuContainer);
++        inventoryMenuContainer = findViewById(R.id.inventoryMenuContainer);
++
++        btnHelp = findViewById(R.id.btnHelp);
++        btnLook = findViewById(R.id.btnLook);
++        btnAttack = findViewById(R.id.btnAttack);
++        btnMove = findViewById(R.id.btnMove);
++        btnInventory = findViewById(R.id.btnInventory);
++        btnSearch = findViewById(R.id.btnSearch);
++
++        btnMoveForward = findViewById(R.id.btnMoveForward);
++        btnMoveBack = findViewById(R.id.btnMoveBack);
++        btnMoveLeft = findViewById(R.id.btnMoveLeft);
++        btnMoveRight = findViewById(R.id.btnMoveRight);
++        btnReturnFromMove = findViewById(R.id.btnReturnFromMove);
++
++        btnInventoryBack = findViewById(R.id.btnInventoryBack);
+ 
+         // Создаём игровой движок и парсер
+         GameEngine engine = new GameEngine();
+         parser = new CommandParser(engine);
+ 
+-        // Обработчик кнопки
+-        sendButton.setOnClickListener(v -> {
+-            String cmd = commandInput.getText().toString().trim();
+-            if (!cmd.isEmpty()) {
+-                appendLog("> " + cmd + "\n");
+-                String result = parser.handle(cmd);
+-                appendLog(result + "\n");
+-                commandInput.setText("");
+-            }
++        btnHelp.setOnClickListener(v -> sendCommand("ПОМОЩЬ", "help"));
++        btnLook.setOnClickListener(v -> sendCommand("ОСМОТРЕТЬСЯ", "look"));
++        btnAttack.setOnClickListener(v -> sendCommand("АТАКА", "attack"));
++
++        btnMove.setOnClickListener(v -> {
++            appendAction("ИДТИ");
++            renderMenu(UiMode.MOVE);
++        });
++
++        btnInventory.setOnClickListener(v -> {
++            appendAction("ИНВЕНТАРЬ");
++            appendLog("Инвентарь пока не реализован\n");
++            renderMenu(UiMode.INVENTORY);
++        });
++
++        btnSearch.setOnClickListener(v -> {
++            appendAction("ПОИСК");
++            appendLog("Вы осматриваете комнату...\n");
++            appendLog(parser.handle("look") + "\n");
++        });
++
++        btnMoveForward.setOnClickListener(v -> sendCommand("ВПЕРЁД", "go north"));
++        btnMoveBack.setOnClickListener(v -> sendCommand("НАЗАД", "go south"));
++        btnMoveRight.setOnClickListener(v -> sendCommand("ВПРАВО", "go east"));
++        btnMoveLeft.setOnClickListener(v -> sendCommand("ВЛЕВО", "go west"));
++        btnReturnFromMove.setOnClickListener(v -> {
++            appendAction("ВЕРНУТЬСЯ");
++            renderMenu(UiMode.MAIN);
++        });
++
++        btnInventoryBack.setOnClickListener(v -> {
++            appendAction("ВЕРНУТЬСЯ");
++            renderMenu(UiMode.MAIN);
+         });
++
++        renderMenu(UiMode.MAIN);
+     }
+ 
+     private void appendLog(String text) {
+         gameLog.append(text);
++        scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
++    }
++
++    private void appendAction(String action) {
++        appendLog("> " + action + "\n");
++    }
++
++    private void sendCommand(String action, String command) {
++        appendAction(action);
++        String result = parser.handle(command);
++        appendLog(result + "\n");
++    }
++
++    private void renderMenu(UiMode mode) {
++        if (mode == UiMode.MAIN) {
++            mainMenuContainer.setVisibility(View.VISIBLE);
++            setMainButtonsVisibility(View.VISIBLE);
++            moveMenuContainer.setVisibility(View.GONE);
++            setMoveButtonsVisibility(View.GONE);
++            inventoryMenuContainer.setVisibility(View.GONE);
++            setInventoryButtonsVisibility(View.GONE);
++        } else if (mode == UiMode.MOVE) {
++            mainMenuContainer.setVisibility(View.GONE);
++            setMainButtonsVisibility(View.GONE);
++            moveMenuContainer.setVisibility(View.VISIBLE);
++            setMoveButtonsVisibility(View.VISIBLE);
++            inventoryMenuContainer.setVisibility(View.GONE);
++            setInventoryButtonsVisibility(View.GONE);
++        } else {
++            mainMenuContainer.setVisibility(View.GONE);
++            setMainButtonsVisibility(View.GONE);
++            moveMenuContainer.setVisibility(View.GONE);
++            setMoveButtonsVisibility(View.GONE);
++            inventoryMenuContainer.setVisibility(View.VISIBLE);
++            setInventoryButtonsVisibility(View.VISIBLE);
++        }
++    }
++
++    private void setMainButtonsVisibility(int visibility) {
++        btnHelp.setVisibility(visibility);
++        btnLook.setVisibility(visibility);
++        btnAttack.setVisibility(visibility);
++        btnMove.setVisibility(visibility);
++        btnInventory.setVisibility(visibility);
++        btnSearch.setVisibility(visibility);
++    }
++
++    private void setMoveButtonsVisibility(int visibility) {
++        btnMoveForward.setVisibility(visibility);
++        btnMoveBack.setVisibility(visibility);
++        btnMoveLeft.setVisibility(visibility);
++        btnMoveRight.setVisibility(visibility);
++        btnReturnFromMove.setVisibility(visibility);
++    }
++
++    private void setInventoryButtonsVisibility(int visibility) {
++        btnInventoryBack.setVisibility(visibility);
+     }
+-}
+\ No newline at end of file
++}
