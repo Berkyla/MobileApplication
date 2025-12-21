@@ -118,10 +118,10 @@
         android:id="@+id/minimapCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/bg_panel"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:padding="8dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -156,7 +156,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/bg_panel"
         android:orientation="vertical"
         android:padding="10dp">
@@ -194,358 +194,423 @@
         </ScrollView>
     </LinearLayout>
 
-    <!-- Action panel (scrollable for small screens) -->
-    <ScrollView
+    <!-- Action panel -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="12dp"
-        android:fillViewport="false"
-        android:overScrollMode="ifContentScrolls">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_panel"
+        android:orientation="vertical"
+        android:padding="10dp">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Панель действий"
+            android:textColor="@color/arcane_text_secondary"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.02"
+            android:paddingBottom="6dp" />
+
+        <!-- Главное меню -->
         <LinearLayout
+            android:id="@+id/mainMenuContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_panel"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnHelp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_arcane"
+                    android:minHeight="52dp"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="ПОМОЩЬ"
+                    android:textColor="@color/arcane_text_primary"
+                    android:textSize="14sp" />
+
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="0dp" />
+
+                <Button
+                    android:id="@+id/btnLook"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_arcane"
+                    android:minHeight="52dp"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="ОСМОТРЕТЬСЯ"
+                    android:textColor="@color/arcane_text_primary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <Button
+                    android:id="@+id/btnAttack"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_arcane"
+                    android:minHeight="52dp"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="АТАКА"
+                    android:textColor="@color/arcane_text_primary"
+                    android:textSize="14sp" />
+
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="0dp" />
+
+                <Button
+                    android:id="@+id/btnMove"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_arcane"
+                    android:minHeight="52dp"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="ИДТИ"
+                    android:textColor="@color/arcane_text_primary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <Button
+                    android:id="@+id/btnMagic"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_arcane"
+                    android:minHeight="52dp"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="МАГИЯ"
+                    android:textColor="@color/arcane_text_primary"
+                    android:textSize="14sp" />
+
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="0dp" />
+
+                <Button
+                    android:id="@+id/btnOpen"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_arcane"
+                    android:minHeight="52dp"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:text="ОТКРЫТЬ"
+                    android:textColor="@color/arcane_text_primary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnInventory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_button_arcane"
+                android:minHeight="52dp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="ИНВЕНТАРЬ"
+                android:textColor="@color/arcane_text_primary"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- Меню движения -->
+        <LinearLayout
+            android:id="@+id/moveMenuContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="12dp">
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnMoveForward"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_arcane"
+                    android:text="ВПЕРЁД"
+                    android:textColor="@color/arcane_text_primary" />
+
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="0dp" />
+
+                <Button
+                    android:id="@+id/btnMoveBack"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_arcane"
+                    android:text="НАЗАД"
+                    android:textColor="@color/arcane_text_primary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <Button
+                    android:id="@+id/btnMoveLeft"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_arcane"
+                    android:text="ВЛЕВО"
+                    android:textColor="@color/arcane_text_primary" />
+
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="0dp" />
+
+                <Button
+                    android:id="@+id/btnMoveRight"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_button_arcane"
+                    android:text="ВПРАВО"
+                    android:textColor="@color/arcane_text_primary" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnReturnFromMove"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_button_arcane"
+                android:text="ВЕРНУТЬСЯ"
+                android:textColor="@color/arcane_text_primary" />
+        </LinearLayout>
+
+        <!-- Меню магии -->
+        <LinearLayout
+            android:id="@+id/magicMenuContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Панель действий"
+                android:text="Заклинания"
                 android:textColor="@color/arcane_text_secondary"
-                android:textSize="14sp"
                 android:textStyle="bold"
+                android:textSize="14sp"
                 android:letterSpacing="0.02"
                 android:paddingBottom="6dp" />
 
-            <!-- Главное меню -->
-            <LinearLayout
-                android:id="@+id/mainMenuContainer"
+            <Button
+                android:id="@+id/btnCastIceShard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:background="@drawable/bg_button_arcane"
+                android:text="✨ ЛЕДЯНОЙ ОСКОЛОК (10 маны)"
+                android:textColor="@color/arcane_text_primary" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+            <Button
+                android:id="@+id/btnMagicBack"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_button_arcane"
+                android:text="ВЕРНУТЬСЯ"
+                android:textColor="@color/arcane_text_primary" />
+        </LinearLayout>
+
+        <!-- Меню инвентаря -->
+        <LinearLayout
+            android:id="@+id/inventoryMenuContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_panel"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:text="Экипировка"
+                    android:textColor="@color/arcane_text_secondary"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:letterSpacing="0.02"
+                    android:paddingBottom="4dp" />
 
-                    <Button
-                        android:id="@+id/btnHelp"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_button_arcane"
-                        android:text="ПОМОЩЬ"
-                        android:textColor="@color/arcane_text_primary" />
-
-                    <View
-                        android:layout_width="8dp"
-                        android:layout_height="0dp" />
-
-                    <Button
-                        android:id="@+id/btnLook"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_button_arcane"
-                        android:text="ОСМОТРЕТЬСЯ"
-                        android:textColor="@color/arcane_text_primary" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/equipmentWeapon"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp">
+                    android:text="🗡 Оружие: нет"
+                    android:textColor="@color/arcane_text_primary"
+                    android:textSize="14sp"
+                    android:paddingBottom="2dp" />
 
-                    <Button
-                        android:id="@+id/btnAttack"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_button_arcane"
-                        android:text="АТАКА"
-                        android:textColor="@color/arcane_text_primary" />
-
-                    <View
-                        android:layout_width="8dp"
-                        android:layout_height="0dp" />
-
-                    <Button
-                        android:id="@+id/btnMove"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_button_arcane"
-                        android:text="ИДТИ"
-                        android:textColor="@color/arcane_text_primary" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/equipmentHelmet"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp">
+                    android:text="🪖 Голова: нет"
+                    android:textColor="@color/arcane_text_primary"
+                    android:textSize="14sp"
+                    android:paddingBottom="2dp" />
 
-                    <Button
-                        android:id="@+id/btnOpen"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_button_arcane"
-                        android:text="ОТКРЫТЬ"
-                        android:textColor="@color/arcane_text_primary" />
+                <TextView
+                    android:id="@+id/equipmentBody"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🧥 Тело: нет"
+                    android:textColor="@color/arcane_text_primary"
+                    android:textSize="14sp"
+                    android:paddingBottom="2dp" />
 
-                    <View
-                        android:layout_width="8dp"
-                        android:layout_height="0dp" />
+                <TextView
+                    android:id="@+id/equipmentLegs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="👖 Ноги: нет"
+                    android:textColor="@color/arcane_text_primary"
+                    android:textSize="14sp"
+                    android:paddingBottom="2dp" />
 
-                    <Button
-                        android:id="@+id/btnInventory"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_button_arcane"
-                        android:text="ИНВЕНТАРЬ"
-                        android:textColor="@color/arcane_text_primary" />
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/equipmentBoots"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🥾 Ботинки: нет"
+                    android:textColor="@color/arcane_text_primary"
+                    android:textSize="14sp"
+                    android:paddingBottom="8dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/arcane_divider"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/equipmentDamage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⚔ Урон: 0"
+                    android:textColor="@color/arcane_text_secondary"
+                    android:textSize="14sp"
+                    android:paddingBottom="2dp" />
+
+                <TextView
+                    android:id="@+id/equipmentDefense"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🛡 Защита: 0"
+                    android:textColor="@color/arcane_text_secondary"
+                    android:textSize="14sp"
+                    android:paddingBottom="2dp" />
+
+                <TextView
+                    android:id="@+id/equipmentCoins"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🪙 Монеты: 0"
+                    android:textColor="@color/arcane_text_secondary"
+                    android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- Меню движения -->
             <LinearLayout
-                android:id="@+id/moveMenuContainer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_panel"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:padding="12dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:text="Инвентарь"
+                    android:textColor="@color/arcane_text_secondary"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:letterSpacing="0.02"
+                    android:paddingBottom="6dp" />
 
-                    <Button
-                        android:id="@+id/btnMoveForward"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_button_arcane"
-                        android:text="ВПЕРЁД"
-                        android:textColor="@color/arcane_text_primary" />
-
-                    <View
-                        android:layout_width="8dp"
-                        android:layout_height="0dp" />
-
-                    <Button
-                        android:id="@+id/btnMoveBack"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_button_arcane"
-                        android:text="НАЗАД"
-                        android:textColor="@color/arcane_text_primary" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp">
-
-                    <Button
-                        android:id="@+id/btnMoveLeft"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_button_arcane"
-                        android:text="ВЛЕВО"
-                        android:textColor="@color/arcane_text_primary" />
-
-                    <View
-                        android:layout_width="8dp"
-                        android:layout_height="0dp" />
-
-                    <Button
-                        android:id="@+id/btnMoveRight"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_button_arcane"
-                        android:text="ВПРАВО"
-                        android:textColor="@color/arcane_text_primary" />
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/btnReturnFromMove"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:background="@drawable/bg_button_arcane"
-                    android:text="ВЕРНУТЬСЯ"
-                    android:textColor="@color/arcane_text_primary" />
-            </LinearLayout>
-
-            <!-- Меню инвентаря -->
-            <LinearLayout
-                android:id="@+id/inventoryMenuContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_panel"
-                    android:orientation="vertical"
-                    android:padding="12dp"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Экипировка"
-                        android:textColor="@color/arcane_text_secondary"
-                        android:textStyle="bold"
-                        android:textSize="14sp"
-                        android:letterSpacing="0.02"
-                        android:paddingBottom="4dp" />
-
-                    <TextView
-                        android:id="@+id/equipmentWeapon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🗡 Оружие: нет"
-                        android:textColor="@color/arcane_text_primary"
-                        android:textSize="14sp"
-                        android:paddingBottom="2dp" />
-
-                    <TextView
-                        android:id="@+id/equipmentHelmet"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🪖 Голова: нет"
-                        android:textColor="@color/arcane_text_primary"
-                        android:textSize="14sp"
-                        android:paddingBottom="2dp" />
-
-                    <TextView
-                        android:id="@+id/equipmentBody"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🧥 Тело: нет"
-                        android:textColor="@color/arcane_text_primary"
-                        android:textSize="14sp"
-                        android:paddingBottom="2dp" />
-
-                    <TextView
-                        android:id="@+id/equipmentLegs"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="👖 Ноги: нет"
-                        android:textColor="@color/arcane_text_primary"
-                        android:textSize="14sp"
-                        android:paddingBottom="2dp" />
-
-                    <TextView
-                        android:id="@+id/equipmentBoots"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🥾 Ботинки: нет"
-                        android:textColor="@color/arcane_text_primary"
-                        android:textSize="14sp"
-                        android:paddingBottom="8dp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/arcane_divider"
-                        android:layout_marginBottom="8dp" />
-
-                    <TextView
-                        android:id="@+id/equipmentDamage"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="⚔ Урон: 0"
-                        android:textColor="@color/arcane_text_secondary"
-                        android:textSize="14sp"
-                        android:paddingBottom="2dp" />
-
-                    <TextView
-                        android:id="@+id/equipmentDefense"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🛡 Защита: 0"
-                        android:textColor="@color/arcane_text_secondary"
-                        android:textSize="14sp"
-                        android:paddingBottom="2dp" />
-
-                    <TextView
-                        android:id="@+id/equipmentCoins"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🪙 Монеты: 0"
-                        android:textColor="@color/arcane_text_secondary"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <LinearLayout
+                <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:background="@drawable/bg_panel"
-                    android:orientation="vertical"
-                    android:padding="12dp">
+                    android:fillViewport="true"
+                    android:scrollbars="none">
 
-                    <TextView
+                    <LinearLayout
+                        android:id="@+id/inventoryList"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Инвентарь"
-                        android:textColor="@color/arcane_text_secondary"
-                        android:textStyle="bold"
-                        android:textSize="14sp"
-                        android:letterSpacing="0.02"
-                        android:paddingBottom="6dp" />
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal" />
+                </HorizontalScrollView>
 
-                    <HorizontalScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:fillViewport="true"
-                        android:scrollbars="none">
-
-                        <LinearLayout
-                            android:id="@+id/inventoryList"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:orientation="horizontal" />
-                    </HorizontalScrollView>
-
-                    <TextView
-                        android:id="@+id/inventoryEmpty"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Рюкзак пуст."
-                        android:textColor="@color/arcane_text_secondary"
-                        android:textSize="13sp" />
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/btnInventoryBack"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/inventoryEmpty"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:background="@drawable/bg_button_arcane"
-                    android:text="ВЕРНУТЬСЯ"
-                    android:textColor="@color/arcane_text_primary" />
+                    android:text="Рюкзак пуст."
+                    android:textColor="@color/arcane_text_secondary"
+                    android:textSize="13sp" />
             </LinearLayout>
 
+            <Button
+                android:id="@+id/btnInventoryBack"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_button_arcane"
+                android:text="ВЕРНУТЬСЯ"
+                android:textColor="@color/arcane_text_primary" />
         </LinearLayout>
-    </ScrollView>
+
+    </LinearLayout>
 
 </LinearLayout>

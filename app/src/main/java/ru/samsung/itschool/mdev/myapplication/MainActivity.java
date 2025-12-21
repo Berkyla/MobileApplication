@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btnHelp;
     private Button btnLook;
     private Button btnAttack;
+    private Button btnMagic;
     private Button btnMove;
     private Button btnInventory;
     private Button btnOpen;
@@ -37,12 +38,15 @@ public class MainActivity extends AppCompatActivity {
     private Button btnReturnFromMove;
 
     private Button btnInventoryBack;
+    private Button btnMagicBack;
+    private Button btnCastIceShard;
 
     private CommandParser parser;
 
     private LinearLayout mainMenuContainer;
     private LinearLayout moveMenuContainer;
     private LinearLayout inventoryMenuContainer;
+    private LinearLayout magicMenuContainer;
     private TextView subtitleText;
     private ProgressBar hpBar;
     private ProgressBar manaBar;
@@ -66,7 +70,8 @@ public class MainActivity extends AppCompatActivity {
     private enum UiMode {
         MAIN,
         MOVE,
-        INVENTORY
+        INVENTORY,
+        MAGIC
     }
 
     @Override
@@ -89,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         mainMenuContainer = findViewById(R.id.mainMenuContainer);
         moveMenuContainer = findViewById(R.id.moveMenuContainer);
         inventoryMenuContainer = findViewById(R.id.inventoryMenuContainer);
+        magicMenuContainer = findViewById(R.id.magicMenuContainer);
         subtitleText = findViewById(R.id.subtitleText);
         hpBar = findViewById(R.id.hpBar);
         manaBar = findViewById(R.id.manaBar);
@@ -109,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
         btnHelp = findViewById(R.id.btnHelp);
         btnLook = findViewById(R.id.btnLook);
         btnAttack = findViewById(R.id.btnAttack);
+        btnMagic = findViewById(R.id.btnMagic);
         btnMove = findViewById(R.id.btnMove);
         btnInventory = findViewById(R.id.btnInventory);
         btnOpen = findViewById(R.id.btnOpen);
@@ -120,6 +127,8 @@ public class MainActivity extends AppCompatActivity {
         btnReturnFromMove = findViewById(R.id.btnReturnFromMove);
 
         btnInventoryBack = findViewById(R.id.btnInventoryBack);
+        btnMagicBack = findViewById(R.id.btnMagicBack);
+        btnCastIceShard = findViewById(R.id.btnCastIceShard);
 
         // Создаём игровой движок и парсер
         engine = new GameEngine();
@@ -137,6 +146,11 @@ public class MainActivity extends AppCompatActivity {
             animateButtonPress(v);
             sendCommand("АТАКА", "attack");
         });
+        btnMagic.setOnClickListener(v -> {
+            animateButtonPress(v);
+            appendAction("МАГИЯ");
+            renderMenu(UiMode.MAGIC);
+        });
         btnOpen.setOnClickListener(v -> {
             animateButtonPress(v);
             sendCommand("ОТКРЫТЬ", "open");
@@ -144,8 +158,13 @@ public class MainActivity extends AppCompatActivity {
 
         btnMove.setOnClickListener(v -> {
             animateButtonPress(v);
-            appendAction("ИДТИ");
-            renderMenu(UiMode.MOVE);
+            if (engine.isInBattle()) {
+                appendAction("ИДТИ");
+                appendLog("Нельзя уйти во время боя.");
+            } else {
+                appendAction("ИДТИ");
+                renderMenu(UiMode.MOVE);
+            }
         });
 
         btnInventory.setOnClickListener(v -> {
@@ -178,6 +197,18 @@ public class MainActivity extends AppCompatActivity {
         btnInventoryBack.setOnClickListener(v -> {
             animateButtonPress(v);
             appendAction("ВЕРНУТЬСЯ");
+            renderMenu(UiMode.MAIN);
+        });
+
+        btnMagicBack.setOnClickListener(v -> {
+            animateButtonPress(v);
+            appendAction("НАЗАД");
+            renderMenu(UiMode.MAIN);
+        });
+
+        btnCastIceShard.setOnClickListener(v -> {
+            animateButtonPress(v);
+            sendCommand("ЛЕДЯНОЙ ОСКОЛОК", "magic");
             renderMenu(UiMode.MAIN);
         });
 
@@ -266,6 +297,8 @@ public class MainActivity extends AppCompatActivity {
                 return moveMenuContainer;
             case INVENTORY:
                 return inventoryMenuContainer;
+            case MAGIC:
+                return magicMenuContainer;
             default:
                 return null;
         }
@@ -306,6 +339,11 @@ public class MainActivity extends AppCompatActivity {
         subtitleText.setText("Этаж " + floor.getIndex() + ": " + floor.getName());
 
         renderMinimap(engine.getCurrentFloorGrid());
+
+        btnAttack.setEnabled(true);
+        btnMagic.setEnabled(true);
+        btnAttack.setAlpha(1f);
+        btnMagic.setAlpha(1f);
     }
 
     private void refreshInventoryView() {
@@ -352,7 +390,7 @@ public class MainActivity extends AppCompatActivity {
             row.setMinimumWidth(dpToPx(180));
 
             TextView title = new TextView(this);
-            title.setText(item.getEmoji() + " " + item.getName());
+            title.setText(item.getIcon() + " " + item.getName());
             title.setTextSize(15f);
             title.setTextColor(ContextCompat.getColor(this, R.color.arcane_text_primary));
             row.addView(title);
@@ -394,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
     private void handleItemAction(Item item) {
         appendAction("ИНВЕНТАРЬ");
         String result = engine.useItem(item);
-        appendLog(result + " " + engine.getPlayerStats());
+        appendLog(result);
         updateUiFromEngine();
         refreshInventoryView();
     }

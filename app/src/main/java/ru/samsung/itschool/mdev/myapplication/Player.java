@@ -21,8 +21,8 @@ public class Player {
         this.health = 100;  // здоровье игрока
         this.maxMana = 50;
         this.mana = 50;
-        this.baseDamage = 8;   // базовый урон игрока
-        this.baseDefense = 0;
+        this.baseDamage = 10;   // базовый урон игрока
+        this.baseDefense = 1;
         this.coins = 0;
         this.inventory = new java.util.ArrayList<>();
     }
@@ -40,23 +40,35 @@ public class Player {
         return baseDamage + weaponBonus;
     }
 
-    public void takeDamage(int dmg) {
+    public int takeDamage(int dmg) {
         int finalDamage = Math.max(1, dmg - getTotalDefense());
         health -= finalDamage;
         if (health < 0) {
             health = 0;
         }
+        return finalDamage;
+    }
+
+    public int takePureDamage(int dmg) {
+        int finalDamage = Math.max(1, dmg - getTotalDefense());
+        health -= finalDamage;
+        if (health < 0) {
+            health = 0;
+        }
+        return finalDamage;
     }
 
     public boolean isDead() {
         return health <= 0;
     }
 
-    public void heal(int amount) {
+    public int heal(int amount) {
+        int before = health;
         health += amount;
         if (health > maxHealth) {
             health = maxHealth;
         }
+        return health - before;
     }
 
     public int getMaxHealth() {
@@ -78,11 +90,13 @@ public class Player {
         }
     }
 
-    public void restoreMana(int amount) {
+    public int restoreMana(int amount) {
+        int before = mana;
         mana += amount;
         if (mana > maxMana) {
             mana = maxMana;
         }
+        return mana - before;
     }
 
     public void addCoins(int amount) {
@@ -198,5 +212,10 @@ public class Player {
 
     public void collectCoinsItem(int amount) {
         coins += amount;
+    }
+
+    public void restoreFull() {
+        this.health = maxHealth;
+        this.mana = maxMana;
     }
 }

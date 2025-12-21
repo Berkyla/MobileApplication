@@ -69,6 +69,10 @@ public class Item {
         return emoji;
     }
 
+    public String getIcon() {
+        return emoji;
+    }
+
     public ItemType getType() {
         return type;
     }

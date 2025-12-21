@@ -82,6 +82,7 @@ public class Floor {
         placeKeyChest();
         placeLootBags();
         placeEnemies();
+        placeBoss();
     }
 
     private boolean[][] getTemplateForFloor(int idx) {
@@ -222,17 +223,112 @@ public class Floor {
             }
         }
 
-        int enemyCount = Math.min(2, normalRooms.size());
+        int enemyCount = Math.min(3 + index, normalRooms.size());
         Random random = new Random(index * 2468L);
         for (int i = 0; i < enemyCount; i++) {
             if (normalRooms.isEmpty()) {
                 break;
             }
             Room room = normalRooms.remove(random.nextInt(normalRooms.size()));
-            int health = 20 + (index * 5);
-            int damage = 5 + (index * 2);
-            room.setEnemy(new Enemy("Страж этажа " + index, health, damage));
+            room.setEnemy(createMob(random));
         }
+    }
+
+    private void placeBoss() {
+        if (bossRoom == null) return;
+        bossRoom.setEnemy(createBoss());
+    }
+
+    private Enemy createMob(Random random) {
+        int roll = random.nextInt(100);
+        String name;
+        int health;
+        int damage;
+
+        if (index == 1) {
+            if (roll < 60) {
+                name = "Подземный ткач";
+                health = 28;
+                damage = 6;
+            } else if (roll < 90) {
+                name = "Мёртвый часовой";
+                health = 36;
+                damage = 8;
+            } else {
+                name = "Несущий погибель";
+                health = 44;
+                damage = 10;
+            }
+        } else if (index == 2) {
+            if (roll < 40) {
+                name = "Подземный ткач";
+                health = 38;
+                damage = 9;
+            } else if (roll < 75) {
+                name = "Мёртвый часовой";
+                health = 50;
+                damage = 12;
+            } else {
+                name = "Несущий погибель";
+                health = 64;
+                damage = 14;
+            }
+        } else {
+            if (roll < 20) {
+                name = "Подземный ткач";
+                health = 50;
+                damage = 12;
+            } else if (roll < 60) {
+                name = "Мёртвый часовой";
+                health = 68;
+                damage = 16;
+            } else {
+                name = "Несущий погибель";
+                health = 82;
+                damage = 20;
+            }
+        }
+
+        int coins = getMobCoinReward(random);
+        Enemy mob = new Enemy(name, health, damage, coins, false);
+        if (random.nextInt(100) < getMobConsumableChance()) {
+            mob.addLoot(ItemFactory.randomHealForFloor(index));
+        }
+        if (random.nextInt(100) < getMobConsumableChance() / 2 + 20) {
+            mob.addLoot(ItemFactory.randomManaForFloor(index));
+        }
+        return mob;
+    }
+
+    private int getMobCoinReward(Random random) {
+        if (index == 1) {
+            return 6 + random.nextInt(7);
+        } else if (index == 2) {
+            return 12 + random.nextInt(9);
+        } else {
+            return 18 + random.nextInt(11);
+        }
+    }
+
+    private int getMobConsumableChance() {
+        if (index == 1) return 45;
+        if (index == 2) return 55;
+        return 70;
+    }
+
+    private Enemy createBoss() {
+        Enemy boss;
+        if (index == 1) {
+            boss = new Enemy("Колдун Циан", 70, 12, 45, true);
+        } else if (index == 2) {
+            boss = new Enemy("Магматический лорд", 110, 18, 70, true);
+        } else {
+            boss = new Enemy("Тёмный кардинал", 150, 24, 100, true);
+        }
+        boss.addLoot(ItemFactory.randomBossReward(index));
+        boss.addLoot(ItemFactory.randomArmorForFloor(index));
+        boss.addLoot(ItemFactory.randomManaForFloor(index));
+        return boss;
     }
 
     public Room[][] getGrid() {

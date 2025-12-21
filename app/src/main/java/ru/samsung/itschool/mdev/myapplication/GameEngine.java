@@ -25,6 +25,7 @@ public class GameEngine {
                         "look - осмотреться\n" +
                         "go north/south/east/west - идти\n" +
                         "attack - атаковать врага\n" +
+                        "magic - применить заклинание\n" +
                         "open - открыть сундук или мешок";
 
             case "look":
@@ -43,6 +44,11 @@ public class GameEngine {
             case "go east":  return move("east");
             case "go west":  return move("west");
 
+            case "magic":
+            case "cast":
+            case "spell":
+                return castMagic();
+
             default:
                 return "Неизвестная команда. Введите 'help'.";
         }
@@ -58,22 +64,21 @@ public class GameEngine {
         StringBuilder desc = new StringBuilder();
         desc.append(describeRoom());
 
-        Enemy e = currentRoom.getEnemy();
-        if (e != null && !e.isDead()) {
-            desc.append("\nЗдесь враг: ").append(e.getName())
-                    .append(" (здоровье: ").append(e.getHealth()).append(")");
-        }
-
         return desc.toString();
     }
 
     private String move(String direction) {
+        if (hasEnemyInRoom()) {
+            return "Нельзя уйти во время боя.";
+        }
+
         // Специальный переход на следующий этаж из комнаты босса
         if (currentRoom != null
                 && currentRoom.isBossRoom()
                 && world.getCurrentFloor().isBossDefeated()
                 && world.hasNextFloor()
                 && "north".equals(direction)) {
+            player.removeKeyItems();
             world.moveToNextFloor();
             currentRoom = world.getStartRoom();
             if (currentRoom != null) {
@@ -94,6 +99,7 @@ public class GameEngine {
         }
 
         currentRoom = next;
+        currentRoom.visit();
 
         StringBuilder sb = new StringBuilder("Вы переместились.\n");
 
@@ -120,52 +126,6 @@ public class GameEngine {
         }
     }
 
-    private String attackEnemy() {
-        Enemy enemy = currentRoom.getEnemy();
-
-        if (enemy == null || enemy.isDead()) {
-            return "Здесь нет врагов.";
-        }
-
-        // игрок атакует
-        int playerDamage = player.getDamage();
-        enemy.takeDamage(playerDamage);
-
-        if (enemy.isDead()) {
-            return "Вы ударили (" + playerDamage + ") и убили врага: " + enemy.getName();
-        }
-
-        // враг атакует
-        int incoming = Math.max(1, enemy.getDamage() - player.getTotalDefense());
-        player.takeDamage(enemy.getDamage());
-
-        if (player.isDead()) {
-            return "Вы атаковали врага, но он ударил в ответ.\n" +
-                    "Вы погибли.\nИгра окончена!";
-        }
-
-        return "Вы ударили врага (" + playerDamage + " урона).\n" +
-                enemy.getName() + " атакует в ответ (" + incoming + " урона, защита учтена).\n" +
-                "Ваше здоровье: " + player.getHealth() + "\n" +
-                "Здоровье врага: " + enemy.getHealth();
-    }
-
-    private String handleBossEntry() {
-        Floor floor = world.getCurrentFloor();
-        if (!floor.isBossDefeated()) {
-            floor.setKeyFound(false); // ключ израсходован
-            player.removeKeyItems();
-            floor.setBossDefeated(true);
-            if (world.hasNextFloor()) {
-                return "Вы использовали ключ и вошли в покои босса. Победа за вами! Лестница на север ведёт на следующий этаж.\n";
-            } else {
-                return "Это последний босс, и вы одержали победу!\n";
-            }
-        } else {
-            return "Комната босса уже очищена.\n";
-        }
-    }
-
     private String describeRoom() {
         StringBuilder desc = new StringBuilder();
         Floor floor = world.getCurrentFloor();
@@ -180,7 +140,7 @@ public class GameEngine {
 
         if (currentRoom.isBossRoom()) {
             if (!floor.isKeyFound()) {
-                desc.append("\nПеред вами массивная дверь босса. Нужн ключ.");
+                desc.append("\nПеред вами массивная дверь босса. Нужен ключ.");
             } else if (!floor.isBossDefeated()) {
                 desc.append("\nДверь босса открыта, впереди решающая схватка.");
             } else {
@@ -189,6 +149,13 @@ public class GameEngine {
                     desc.append(" Лестница на север ведёт дальше.");
                 }
             }
+        }
+
+        Enemy enemy = currentRoom.getEnemy();
+        if (enemy != null && !enemy.isDead()) {
+            desc.append("\nВ комнате враг: ").append(enemy.getName())
+                    .append(" (").append(enemy.getHealth()).append("/").append(enemy.getMaxHealth())
+                    .append(" HP, атака ").append(enemy.getDamage()).append(").");
         }
 
         appendContainerDescription(desc);
@@ -239,6 +206,9 @@ public class GameEngine {
     }
 
     public String openContainer() {
+        if (hasEnemyInRoom()) {
+            return "Нельзя открыть что-либо во время боя.";
+        }
         if (currentRoom.hasChest() && currentRoom.getChestContainer() != null && !currentRoom.getChestContainer().isOpened()) {
             return lootChest();
         }
@@ -258,17 +228,18 @@ public class GameEngine {
         currentRoom.openChest();
         player.addCoins(chest.getCoins());
 
-        StringBuilder message = new StringBuilder("Вы открыли сундук: +" + chest.getCoins() + " 🪙");
+        StringBuilder message = new StringBuilder("Вы открыли сундук: +" + chest.getCoins() + " 💰");
 
         if (chest.hasKey()) {
             world.getCurrentFloor().setKeyFound(true);
-            player.addItem(ItemFactory.bossKey());
-            message.append(", найден ").append(ItemFactory.bossKey().getEmoji()).append(" ").append(ItemFactory.bossKey().getName());
+            Item key = ItemFactory.bossKey();
+            player.addItem(key);
+            message.append(", найден ").append(key.getIcon()).append(" ").append(key.getName());
         }
 
         for (Item item : chest.getItems()) {
             player.addItem(item);
-            message.append(", получено ").append(item.getEmoji()).append(" ").append(item.getName());
+            message.append(", получено ").append(item.getIcon()).append(" ").append(item.getName());
         }
 
         if (chest.getItems().isEmpty() && !chest.hasKey()) {
@@ -286,10 +257,10 @@ public class GameEngine {
         bag.setOpened(true);
         currentRoom.collectLoot();
         player.addCoins(bag.getCoins());
-        StringBuilder message = new StringBuilder("Вы открыли мешок: +" + bag.getCoins() + " 🪙");
+        StringBuilder message = new StringBuilder("Вы открыли мешок: +" + bag.getCoins() + " 💰");
         for (Item item : bag.getItems()) {
             player.addItem(item);
-            message.append(", найдено ").append(item.getEmoji()).append(" ").append(item.getName());
+            message.append(", найдено ").append(item.getIcon()).append(" ").append(item.getName());
         }
         return message.toString();
     }
@@ -316,13 +287,31 @@ public class GameEngine {
         if (item == null) return "Предмет не найден.";
 
         if (item.isConsumable()) {
-            player.useConsumable(item);
-            return "Вы используете " + item.getEmoji() + " " + item.getName() + ".";
+            StringBuilder sb = new StringBuilder();
+            if (item.getType() == Item.ItemType.CONSUMABLE_HP) {
+                int healed = player.heal(item.getHealAmount());
+                sb.append("Вы используете ").append(item.getIcon()).append(" ").append(item.getName())
+                        .append(": +").append(healed).append(" HP.");
+            } else if (item.getType() == Item.ItemType.CONSUMABLE_MANA) {
+                int restored = player.restoreMana(item.getManaRestore());
+                sb.append("Вы пьёте ").append(item.getIcon()).append(" ").append(item.getName())
+                        .append(": +").append(restored).append(" маны.");
+            }
+            player.removeItem(item);
+
+            if (hasEnemyInRoom()) {
+                Enemy enemy = currentRoom.getEnemy();
+                sb.append("\nПока вы роетесь в рюкзаке, ")
+                        .append(enemy.getName()).append(" пользуется моментом.");
+                appendEnemyTurn(sb, enemy);
+            }
+            sb.append("\n").append(getPlayerStats());
+            return sb.toString();
         }
 
         if (item.isArmor() || item.isWeapon()) {
             player.equip(item);
-            return "Вы экипировали " + item.getEmoji() + " " + item.getName() + ".";
+            return "Вы экипировали " + item.getIcon() + " " + item.getName() + ".";
         }
 
         if (item.getType() == Item.ItemType.KEY) {
@@ -334,5 +323,145 @@ public class GameEngine {
 
     public String getPlayerStats() {
         return "Урон: " + player.getTotalDamage() + ", защита: " + player.getTotalDefense();
+    }
+
+    public boolean isInBattle() {
+        return hasEnemyInRoom();
+    }
+
+    private boolean hasEnemyInRoom() {
+        Enemy enemy = currentRoom != null ? currentRoom.getEnemy() : null;
+        return enemy != null && !enemy.isDead();
+    }
+
+    private String castMagic() {
+        Enemy enemy = currentRoom.getEnemy();
+        if (enemy == null || enemy.isDead()) {
+            return "Некого атаковать.";
+        }
+        int manaCost = 10;
+        if (player.getMana() < manaCost) {
+            return "Недостаточно маны.";
+        }
+        player.spendMana(manaCost);
+        int base = player.getTotalDamage();
+        int spellDamage = Math.max(1, (int) Math.round(base * 1.2) + 2);
+        enemy.takeDamage(spellDamage);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Вы произносите ✨ Ледяной осколок: -").append(spellDamage)
+                .append(" HP врагу ").append(enemy.getName()).append(".");
+
+        if (enemy.isDead()) {
+            sb.append(handleEnemyDefeat(enemy));
+            return sb.toString();
+        }
+
+        sb.append("\nМана: ").append(player.getMana()).append("/").append(player.getMaxMana());
+        appendEnemyTurn(sb, enemy);
+        if (!player.isDead()) {
+            sb.append("\nЗдоровье врага: ").append(enemy.getHealth()).append("/").append(enemy.getMaxHealth());
+        }
+        return sb.toString();
+    }
+
+    private String handleBossEntry() {
+        Floor floor = world.getCurrentFloor();
+        if (!floor.isBossDefeated()) {
+            player.removeKeyItems();
+            Enemy enemy = floor.getBossRoom() != null ? floor.getBossRoom().getEnemy() : null;
+            if (enemy != null) {
+                return "Вы открываете дверь в покои босса. Внутри ждёт " + enemy.getName() + ".";
+            }
+            return "Покои босса пусты, но напряжение не спадает.";
+        } else {
+            if (world.hasNextFloor()) {
+                return "Комната босса очищена. На север ведёт лестница дальше.\n";
+            }
+            return "Все боссы побеждены, в зале тихо.\n";
+        }
+    }
+
+    private String attackEnemy() {
+        Enemy enemy = currentRoom.getEnemy();
+
+        if (enemy == null || enemy.isDead()) {
+            return "Некого атаковать.";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        int playerDamage = player.getDamage();
+        enemy.takeDamage(playerDamage);
+
+        sb.append("Вы ударили: -").append(playerDamage)
+                .append(" HP врагу ").append(enemy.getName()).append(".");
+
+        if (enemy.isDead()) {
+            sb.append(handleEnemyDefeat(enemy));
+            return sb.toString();
+        }
+
+        appendEnemyTurn(sb, enemy);
+
+        if (player.isDead()) {
+            return sb.toString();
+        }
+
+        sb.append("\nЗдоровье врага: ").append(enemy.getHealth()).append("/").append(enemy.getMaxHealth());
+        return sb.toString();
+    }
+
+    private void appendEnemyTurn(StringBuilder sb, Enemy enemy) {
+        int incoming = player.takeDamage(enemy.getDamage());
+        sb.append("\n").append(enemy.getName()).append(" атакует: -")
+                .append(incoming).append(" HP вам.");
+        if (player.isDead()) {
+            sb.append("\n").append(handlePlayerDeath());
+        } else {
+            sb.append("\nВаше здоровье: ").append(player.getHealth())
+                    .append("/").append(player.getMaxHealth());
+        }
+    }
+
+    private String handleEnemyDefeat(Enemy enemy) {
+        Floor floor = world.getCurrentFloor();
+        StringBuilder sb = new StringBuilder("\nВраг повержен!");
+        if (enemy.getCoinsReward() > 0) {
+            player.addCoins(enemy.getCoinsReward());
+            sb.append(" +").append(enemy.getCoinsReward()).append(" 💰.");
+        }
+        if (!enemy.getLoot().isEmpty()) {
+            sb.append(" Добыча: ");
+            for (int i = 0; i < enemy.getLoot().size(); i++) {
+                Item item = enemy.getLoot().get(i);
+                player.addItem(item);
+                sb.append(item.getIcon()).append(" ").append(item.getName());
+                if (i < enemy.getLoot().size() - 1) {
+                    sb.append(", ");
+                }
+            }
+            sb.append(".");
+        }
+        if (enemy.isBoss()) {
+            floor.setBossDefeated(true);
+            sb.append(" Комната босса очищена.");
+            if (world.hasNextFloor()) {
+                sb.append(" Путь на север открыт.");
+            } else {
+                sb.append(" Вы завершили приключение!");
+            }
+        }
+        currentRoom.setEnemy(null);
+        return sb.toString();
+    }
+
+    private String handlePlayerDeath() {
+        Floor floor = world.getCurrentFloor();
+        currentRoom = floor.getStartRoom();
+        if (currentRoom != null) {
+            currentRoom.visit();
+        }
+        player.restoreFull();
+        return "Вы погибли... Вас оттаскивают к началу этажа. Силы восстановлены, но враг всё ещё в комате.";
     }
 }

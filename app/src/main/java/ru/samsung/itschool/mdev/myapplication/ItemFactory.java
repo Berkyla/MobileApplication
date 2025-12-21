@@ -72,7 +72,7 @@ public class ItemFactory {
     // --- Броня: сет разбойника ---
     public static Item rogueHelmet() {
         return new Item("armor_rogue_helmet", "Шлем разбойника",
-                "Лёгкая защита головы.", "🪖", Item.ItemType.ARMOR, Item.ItemSlot.HELMET,
+                "Лёгкая защита головы.", "🧢", Item.ItemType.ARMOR, Item.ItemSlot.HELMET,
                 0, 1, 0, 0, 0);
     }
 
@@ -97,7 +97,7 @@ public class ItemFactory {
     // --- Броня: защитник Мидгарда ---
     public static Item midgardHelmet() {
         return new Item("armor_midgard_helmet", "Шлем защитника Мидгарда",
-                "Отражает удары.", "🪖", Item.ItemType.ARMOR, Item.ItemSlot.HELMET,
+                "Отражает удары.", "⚔️🛡️", Item.ItemType.ARMOR, Item.ItemSlot.HELMET,
                 0, 2, 0, 0, 0);
     }
 
@@ -142,6 +142,46 @@ public class ItemFactory {
         return new Item("armor_shadow_boots", "Ботинки шагнувшего в тень",
                 "Тень под ногами.", "🥾", Item.ItemType.ARMOR, Item.ItemSlot.BOOTS,
                 0, 3, 0, 0, 0);
+    }
+
+    public static Item randomHealForFloor(int floor) {
+        if (floor <= 1) {
+            return RANDOM.nextBoolean() ? weakHealScroll() : healScroll();
+        } else if (floor == 2) {
+            return RANDOM.nextBoolean() ? healScroll() : strongHealScroll();
+        } else {
+            return strongHealScroll();
+        }
+    }
+
+    public static Item randomManaForFloor(int floor) {
+        if (floor <= 1) {
+            return RANDOM.nextBoolean() ? smallManaPotion() : mediumManaPotion();
+        } else if (floor == 2) {
+            return RANDOM.nextBoolean() ? mediumManaPotion() : largeManaPotion();
+        } else {
+            return largeManaPotion();
+        }
+    }
+
+    public static Item randomBossReward(int floor) {
+        if (floor == 1) {
+            return RANDOM.nextBoolean() ? darkBlade() : randomFromList(rogueArmorSet());
+        } else if (floor == 2) {
+            return RANDOM.nextBoolean() ? kingFlame() : randomFromList(midgardArmorSet());
+        } else {
+            return RANDOM.nextBoolean() ? kingFlame() : randomFromList(shadowArmorSet());
+        }
+    }
+
+    public static Item randomArmorForFloor(int floor) {
+        if (floor == 1) {
+            return randomFromList(rogueArmorSet());
+        } else if (floor == 2) {
+            return randomFromList(midgardArmorSet());
+        } else {
+            return randomFromList(shadowArmorSet());
+        }
     }
 
     public static Item bossKey() {
