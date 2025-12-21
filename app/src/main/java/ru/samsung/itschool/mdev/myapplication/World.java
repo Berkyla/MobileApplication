@@ -31,6 +31,10 @@ public class World {
         return currentFloorIndex < floors.length - 1;
     }
 
+    public int getCurrentFloorIndex() {
+        return currentFloorIndex + 1;
+    }
+
     public boolean moveToNextFloor() {
         if (!hasNextFloor()) {
             return false;
@@ -38,5 +42,11 @@ public class World {
         currentFloorIndex++;
         currentFloor = floors[currentFloorIndex];
         return true;
+    }
+
+    public void setCurrentFloorIndex(int floorIndex) {
+        int target = Math.max(1, Math.min(floorIndex, floors.length));
+        this.currentFloorIndex = target - 1;
+        this.currentFloor = floors[this.currentFloorIndex];
     }
 }

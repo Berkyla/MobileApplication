@@ -1,6 +1,7 @@
 package ru.samsung.itschool.mdev.myapplication;
 
 import android.os.Bundle;
+import android.content.Intent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView equipmentDamage;
     private TextView equipmentDefense;
     private TextView equipmentCoins;
+    private SaveManager saveManager;
 
     private UiMode currentMode = null;
 
@@ -80,14 +82,12 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        // Edge-to-edge обработка
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        // Подключение элементов интерфейса
         scrollView = findViewById(R.id.scrollView);
         logContainer = findViewById(R.id.logContainer);
 
@@ -130,9 +130,23 @@ public class MainActivity extends AppCompatActivity {
         btnMagicBack = findViewById(R.id.btnMagicBack);
         btnCastIceShard = findViewById(R.id.btnCastIceShard);
 
-        // Создаём игровой движок и парсер
-        engine = new GameEngine();
+        saveManager = new SaveManager(this);
+
+        String mode = getIntent().getStringExtra("mode");
+        if ("continue".equals(mode) && saveManager.hasSave()) {
+            appendLog("Загрузка сохранения...");
+            engine = new GameEngine(saveManager.load());
+        } else {
+            saveManager.clear();
+            engine = new GameEngine();
+        }
         parser = new CommandParser(engine);
+        engine.setGameEventListener(this::openVictoryScreen);
+
+        if (engine.isAdventureCompleted()) {
+            openVictoryScreen();
+            return;
+        }
 
         btnHelp.setOnClickListener(v -> {
             animateButtonPress(v);
@@ -216,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
         appendLog(parser.handle("look"));
         renderMenu(UiMode.MAIN);
         updateUiFromEngine();
+        saveProgress();
     }
 
     private void appendLog(String text) {
@@ -231,6 +246,9 @@ public class MainActivity extends AppCompatActivity {
         String result = parser.handle(command);
         appendLog(result);
         updateUiFromEngine();
+        if (!"help".equals(command)) {
+            saveProgress();
+        }
     }
 
     private void addLogEntry(String text, boolean isPlayer) {
@@ -435,6 +453,7 @@ public class MainActivity extends AppCompatActivity {
         appendLog(result);
         updateUiFromEngine();
         refreshInventoryView();
+        saveProgress();
     }
 
     private void openInventoryMenu() {
@@ -487,5 +506,29 @@ public class MainActivity extends AppCompatActivity {
                 minimapGrid.addView(cell);
             }
         }
+    }
+
+    private void saveProgress() {
+        if (saveManager == null || engine == null) return;
+        if (engine.isAdventureCompleted()) {
+            saveManager.clear();
+        } else {
+            saveManager.save(engine);
+        }
+    }
+
+    private void openVictoryScreen() {
+        runOnUiThread(() -> {
+            saveManager.clear();
+            Intent intent = new Intent(MainActivity.this, VictoryActivity.class);
+            startActivity(intent);
+            finish();
+        });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveProgress();
     }
 }

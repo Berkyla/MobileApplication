@@ -5,6 +5,8 @@ public class GameEngine {
     private World world;
     private Room currentRoom;
     private Player player;
+    private boolean adventureCompleted;
+    private GameEventListener eventListener;
 
     public GameEngine() {
         world = new World();
@@ -15,18 +17,39 @@ public class GameEngine {
         }
     }
 
+    public GameEngine(SaveManager.SavedState state) {
+        this();
+        if (state != null) {
+            loadState(state);
+        }
+    }
+
+    public interface GameEventListener {
+        void onVictory();
+    }
+
+    public void setGameEventListener(GameEventListener listener) {
+        this.eventListener = listener;
+    }
+
     public String process(String cmd) {
         cmd = cmd.toLowerCase().trim();
 
         switch (cmd) {
             case "help":
-                return "Команды:\n" +
-                        "help - помощь\n" +
-                        "look - осмотреться\n" +
-                        "go north/south/east/west - идти\n" +
-                        "attack - атаковать врага\n" +
-                        "magic - применить заклинание\n" +
-                        "open - открыть сундук или мешок";
+                return "Мини-гайд:\n" +
+                        "• Цель — пройти три этажа Арканного Фронтира, найти ключи и победить каждого босса.\n" +
+                        "• Исследуй комнаты, отмеченные на миникарте, собирай монеты и предметы.\n" +
+                        "• Ключ на каждом этаже спрятан в сундуке. Без него дверь босса не откроется.\n" +
+                        "• Перед боем следи за HP и маной. Используй свитки лечения и зелья маны.\n" +
+                        "• Оружие и броню можно экипировать через инвентарь, чтобы повысить урон и защиту.\n" +
+                        "• В бою доступна атака и заклинание «Ледяной осколок» (требует ману).\n" +
+                        "• После победы над боссом поднимайся выше — но ключ не переносится на следующий этаж.\n\n" +
+                        "Лор:\n" +
+                        "Арканисты ушли из этих залов, оставив башню под охраной магических конструкций.\n" +
+                        "Каждый этаж — испытание: вода, пепел и звёздная высота проверяют решимость искателя.\n" +
+                        "Слухи говорят, что ключи выкованы из осколков древнего портала и тянут к вершине.\n" +
+                        "Доберись до Небесной обсерватории и победой докажи, что башня вновь принадлежит живым.";
 
             case "look":
                 return look();
@@ -50,7 +73,7 @@ public class GameEngine {
                 return castMagic();
 
             default:
-                return "Неизвестная команда. Введите 'help'.";
+                return "Неизвестная комана. Введите 'help'.";
         }
     }
 
@@ -72,7 +95,6 @@ public class GameEngine {
             return "Нельзя уйти во время боя.";
         }
 
-        // Специальный переход на следующий этаж из комнаты босса
         if (currentRoom != null
                 && currentRoom.isBossRoom()
                 && world.getCurrentFloor().isBossDefeated()
@@ -193,6 +215,10 @@ public class GameEngine {
         return player;
     }
 
+    public World getWorld() {
+        return world;
+    }
+
     public Room getCurrentRoom() {
         return currentRoom;
     }
@@ -201,8 +227,17 @@ public class GameEngine {
         return world.getCurrentFloor();
     }
 
+    public int getCurrentFloorIndex() {
+        return world.getCurrentFloorIndex();
+    }
+
     public Room[][] getCurrentFloorGrid() {
         return world.getCurrentFloor().getGrid();
+    }
+
+    public int[] getCurrentPosition() {
+        if (currentRoom == null) return new int[]{0, 0};
+        return new int[]{currentRoom.getX(), currentRoom.getY()};
     }
 
     public String openContainer() {
@@ -329,6 +364,152 @@ public class GameEngine {
         return hasEnemyInRoom();
     }
 
+    public boolean isAdventureCompleted() {
+        return adventureCompleted;
+    }
+
+    public void loadState(SaveManager.SavedState state) {
+        if (state == null) {
+            return;
+        }
+
+        this.world = new World();
+        this.player = new Player();
+        this.adventureCompleted = state.adventureCompleted;
+
+        world.setCurrentFloorIndex(state.floorIndex);
+        Floor floor = world.getCurrentFloor();
+        floor.setKeyFound(state.keyFound);
+        floor.setBossDefeated(state.bossDefeated);
+
+        Room[][] grid = floor.getGrid();
+        int height = grid.length;
+        int width = grid[0].length;
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Room room = grid[y][x];
+                if (room == null) continue;
+
+                boolean visited = state.visited != null && y < state.visited.length && state.visited[y] != null
+                        && x < state.visited[y].length && state.visited[y][x];
+                boolean chestOpened = state.chestOpened != null && y < state.chestOpened.length && state.chestOpened[y] != null
+                        && x < state.chestOpened[y].length && state.chestOpened[y][x];
+                boolean bagOpened = state.bagOpened != null && y < state.bagOpened.length && state.bagOpened[y] != null
+                        && x < state.bagOpened[y].length && state.bagOpened[y][x];
+                boolean enemyDead = state.enemyDead != null && y < state.enemyDead.length && state.enemyDead[y] != null
+                        && x < state.enemyDead[y].length && state.enemyDead[y][x];
+
+                if (visited) {
+                    room.setVisited(true);
+                    if (room.isBossRoom()) {
+                        room.setBossRevealed(true);
+                    }
+                }
+
+                if (room.hasChest()) {
+                    room.setChestOpened(chestOpened);
+                    if (room.getChestContainer() != null) {
+                        room.getChestContainer().setOpened(chestOpened);
+                    }
+                    if (chestOpened) {
+                        room.setChestHasKey(false);
+                    }
+                }
+
+                if (room.hasLootBag()) {
+                    room.setLootCollected(bagOpened);
+                    if (room.getLootContainer() != null) {
+                        room.getLootContainer().setOpened(bagOpened);
+                    }
+                }
+
+                if (enemyDead) {
+                    room.setEnemy(null);
+                }
+            }
+        }
+
+        int px = Math.max(0, Math.min(state.posX, width - 1));
+        int py = Math.max(0, Math.min(state.posY, height - 1));
+        Room target = grid[py][px];
+        if (target == null) {
+            target = floor.getStartRoom();
+        }
+        currentRoom = target;
+        if (currentRoom != null) {
+            currentRoom.visit();
+        }
+
+        player.setHealth(state.playerHealth);
+        player.setMana(state.playerMana);
+        player.setCoins(state.coins);
+
+        java.util.List<Item> restoredInventory = new java.util.ArrayList<>();
+        if (state.inventory != null) {
+            for (SaveManager.ItemStack stack : state.inventory) {
+                Item item = ItemFactory.fromId(stack.id);
+                if (item == null) continue;
+                int count = Math.max(1, stack.count);
+                for (int i = 0; i < count; i++) {
+                    restoredInventory.add(item);
+                }
+            }
+        }
+        player.setInventory(restoredInventory);
+
+        if (state.equipment != null) {
+            if (state.equipment.weapon != null) {
+                Item weapon = ItemFactory.fromId(state.equipment.weapon);
+                player.setWeapon(weapon);
+                removeFirstById(player.getInventory(), state.equipment.weapon);
+            }
+            if (state.equipment.helmet != null) {
+                Item helmet = ItemFactory.fromId(state.equipment.helmet);
+                player.setHelmet(helmet);
+                removeFirstById(player.getInventory(), state.equipment.helmet);
+            }
+            if (state.equipment.body != null) {
+                Item body = ItemFactory.fromId(state.equipment.body);
+                player.setBody(body);
+                removeFirstById(player.getInventory(), state.equipment.body);
+            }
+            if (state.equipment.legs != null) {
+                Item legs = ItemFactory.fromId(state.equipment.legs);
+                player.setLegs(legs);
+                removeFirstById(player.getInventory(), state.equipment.legs);
+            }
+            if (state.equipment.boots != null) {
+                Item boots = ItemFactory.fromId(state.equipment.boots);
+                player.setBoots(boots);
+                removeFirstById(player.getInventory(), state.equipment.boots);
+            }
+        }
+
+        if (state.keyFloor == floor.getIndex() && !floor.isBossDefeated()) {
+            boolean hasKey = false;
+            for (Item item : player.getInventory()) {
+                if (item.getType() == Item.ItemType.KEY) {
+                    hasKey = true;
+                    break;
+                }
+            }
+            if (!hasKey) {
+                player.addItem(ItemFactory.bossKey());
+            }
+        }
+    }
+
+    private void removeFirstById(java.util.List<Item> items, String id) {
+        if (items == null || id == null) return;
+        for (int i = 0; i < items.size(); i++) {
+            if (id.equals(items.get(i).getId())) {
+                items.remove(i);
+                return;
+            }
+        }
+    }
+
     private boolean hasEnemyInRoom() {
         Enemy enemy = currentRoom != null ? currentRoom.getEnemy() : null;
         return enemy != null && !enemy.isDead();
@@ -449,6 +630,10 @@ public class GameEngine {
                 sb.append(" Путь на север открыт.");
             } else {
                 sb.append(" Вы завершили приключение!");
+                adventureCompleted = true;
+                if (eventListener != null) {
+                    eventListener.onVictory();
+                }
             }
         }
         currentRoom.setEnemy(null);

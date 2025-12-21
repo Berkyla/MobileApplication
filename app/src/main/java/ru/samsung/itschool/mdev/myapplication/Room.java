@@ -14,7 +14,7 @@ public class Room {
     private Room east;
     private Room west;
 
-    private Enemy enemy;  // ← добавили врага
+    private Enemy enemy;
     private int x;
     private int y;
     private int floorLevel;
@@ -95,6 +95,10 @@ public class Room {
         this.discovered = true;
     }
 
+    public void setDiscovered(boolean discovered) {
+        this.discovered = discovered;
+    }
+
     public boolean isVisited() {
         return visited;
     }
@@ -102,6 +106,13 @@ public class Room {
     public void visit() {
         this.visited = true;
         this.discovered = true;
+    }
+
+    public void setVisited(boolean visited) {
+        this.visited = visited;
+        if (visited) {
+            this.discovered = true;
+        }
     }
 
     public boolean hasChest() {
@@ -118,6 +129,10 @@ public class Room {
 
     public void openChest() {
         this.chestOpened = true;
+    }
+
+    public void setChestOpened(boolean opened) {
+        this.chestOpened = opened;
     }
 
     public boolean chestHasKey() {
@@ -142,6 +157,10 @@ public class Room {
 
     public void collectLoot() {
         this.lootCollected = true;
+    }
+
+    public void setLootCollected(boolean lootCollected) {
+        this.lootCollected = lootCollected;
     }
 
     public boolean isBossRevealed() {

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/victory_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@color/arcane_bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_panel"
+        android:padding="18dp">
+
+        <TextView
+            android:id="@+id/victoryTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Победа!"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/arcane_accent_gold"
+            android:letterSpacing="0.03" />
+
+        <TextView
+            android:id="@+id/victoryText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Башня затихла. Последний осколок портала гаснет, а ветер из Небесной обсерватории приносит запах свободы.\n\nАрканисты ушли, но их знания и сокровища теперь принадлежат тому, кто дошёл до вершины. Ты доказал, что тьма не вечна."
+            android:textSize="15sp"
+            android:textColor="@color/arcane_text_primary"
+            android:lineSpacingExtra="4dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_panel"
+        android:padding="18dp"
+        android:layout_marginTop="14dp">
+
+        <Button
+            android:id="@+id/btnVictoryMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_button_arcane"
+            android:minHeight="56dp"
+            android:text="В ГЛАВНОЕ МЕНЮ"
+            android:textColor="@color/arcane_text_primary"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btnVictoryNewGame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_button_arcane"
+            android:minHeight="56dp"
+            android:text="НОВАЯ ИГРА"
+            android:textColor="@color/arcane_text_primary"
+            android:textSize="16sp" />
+    </LinearLayout>
+</LinearLayout>

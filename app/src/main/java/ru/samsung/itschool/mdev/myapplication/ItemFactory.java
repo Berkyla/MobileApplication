@@ -4,15 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Набор готовых предметов и простых фабричных методов.
- * Здесь хранятся базовые характеристики, чтобы ими удобно пользоваться при генерации лута.
- */
 public class ItemFactory {
 
-    private static final Random RANDOM = new Random();
+    private static final Random DEFAULT_RANDOM = new Random(51234L);
 
-    // --- Расходники HP ---
     public static Item weakHealScroll() {
         return new Item("scroll_heal_small", "Свиток слабого лечения",
                 "+20 HP", "📜", Item.ItemType.CONSUMABLE_HP, Item.ItemSlot.NONE,
@@ -31,7 +26,6 @@ public class ItemFactory {
                 0, 0, 80, 0, 0);
     }
 
-    // --- Расходники Mana ---
     public static Item smallManaPotion() {
         return new Item("potion_mana_small", "Малое зелье маны",
                 "+15 Mana", "🧪", Item.ItemType.CONSUMABLE_MANA, Item.ItemSlot.NONE,
@@ -50,7 +44,6 @@ public class ItemFactory {
                 0, 0, 0, 50, 0);
     }
 
-    // --- Оружие ---
     public static Item rogueSword() {
         return new Item("weapon_rogue", "Меч разбойника",
                 "Лёгкий клинок.", "🗡️", Item.ItemType.WEAPON, Item.ItemSlot.WEAPON,
@@ -69,7 +62,6 @@ public class ItemFactory {
                 12, 0, 0, 0, 0);
     }
 
-    // --- Броня: сет разбойника ---
     public static Item rogueHelmet() {
         return new Item("armor_rogue_helmet", "Шлем разбойника",
                 "Лёгкая защита головы.", "🧢", Item.ItemType.ARMOR, Item.ItemSlot.HELMET,
@@ -94,7 +86,6 @@ public class ItemFactory {
                 0, 1, 0, 0, 0);
     }
 
-    // --- Броня: защитник Мидгарда ---
     public static Item midgardHelmet() {
         return new Item("armor_midgard_helmet", "Шлем защитника Мидгарда",
                 "Отражает удары.", "⚔️🛡️", Item.ItemType.ARMOR, Item.ItemSlot.HELMET,
@@ -119,7 +110,6 @@ public class ItemFactory {
                 0, 2, 0, 0, 0);
     }
 
-    // --- Броня: шагнувший в тень ---
     public static Item shadowHelmet() {
         return new Item("armor_shadow_helmet", "Шлем шагнувшего в тень",
                 "Закрывает лицо.", "🪖", Item.ItemType.ARMOR, Item.ItemSlot.HELMET,
@@ -145,42 +135,62 @@ public class ItemFactory {
     }
 
     public static Item randomHealForFloor(int floor) {
+        return randomHealForFloor(null, floor);
+    }
+
+    public static Item randomHealForFloor(Random random, int floor) {
+        Random rng = random != null ? random : DEFAULT_RANDOM;
         if (floor <= 1) {
-            return RANDOM.nextBoolean() ? weakHealScroll() : healScroll();
+            return rng.nextBoolean() ? weakHealScroll() : healScroll();
         } else if (floor == 2) {
-            return RANDOM.nextBoolean() ? healScroll() : strongHealScroll();
+            return rng.nextBoolean() ? healScroll() : strongHealScroll();
         } else {
             return strongHealScroll();
         }
     }
 
     public static Item randomManaForFloor(int floor) {
+        return randomManaForFloor(null, floor);
+    }
+
+    public static Item randomManaForFloor(Random random, int floor) {
+        Random rng = random != null ? random : DEFAULT_RANDOM;
         if (floor <= 1) {
-            return RANDOM.nextBoolean() ? smallManaPotion() : mediumManaPotion();
+            return rng.nextBoolean() ? smallManaPotion() : mediumManaPotion();
         } else if (floor == 2) {
-            return RANDOM.nextBoolean() ? mediumManaPotion() : largeManaPotion();
+            return rng.nextBoolean() ? mediumManaPotion() : largeManaPotion();
         } else {
             return largeManaPotion();
         }
     }
 
     public static Item randomBossReward(int floor) {
+        return randomBossReward(null, floor);
+    }
+
+    public static Item randomBossReward(Random random, int floor) {
+        Random rng = random != null ? random : DEFAULT_RANDOM;
         if (floor == 1) {
-            return RANDOM.nextBoolean() ? darkBlade() : randomFromList(rogueArmorSet());
+            return rng.nextBoolean() ? darkBlade() : randomFromList(rogueArmorSet(), rng);
         } else if (floor == 2) {
-            return RANDOM.nextBoolean() ? kingFlame() : randomFromList(midgardArmorSet());
+            return rng.nextBoolean() ? kingFlame() : randomFromList(midgardArmorSet(), rng);
         } else {
-            return RANDOM.nextBoolean() ? kingFlame() : randomFromList(shadowArmorSet());
+            return rng.nextBoolean() ? kingFlame() : randomFromList(shadowArmorSet(), rng);
         }
     }
 
     public static Item randomArmorForFloor(int floor) {
+        return randomArmorForFloor(null, floor);
+    }
+
+    public static Item randomArmorForFloor(Random random, int floor) {
+        Random rng = random != null ? random : DEFAULT_RANDOM;
         if (floor == 1) {
-            return randomFromList(rogueArmorSet());
+            return randomFromList(rogueArmorSet(), rng);
         } else if (floor == 2) {
-            return randomFromList(midgardArmorSet());
+            return randomFromList(midgardArmorSet(), rng);
         } else {
-            return randomFromList(shadowArmorSet());
+            return randomFromList(shadowArmorSet(), rng);
         }
     }
 
@@ -190,8 +200,13 @@ public class ItemFactory {
     }
 
     public static List<Item> randomChestLoot() {
+        return randomChestLoot(null);
+    }
+
+    public static List<Item> randomChestLoot(Random random) {
+        Random rng = random != null ? random : DEFAULT_RANDOM;
         List<Item> loot = new ArrayList<>();
-        int roll = RANDOM.nextInt(100);
+        int roll = rng.nextInt(100);
         if (roll < 40) {
             loot.add(rogueSword());
         } else if (roll < 70) {
@@ -200,15 +215,20 @@ public class ItemFactory {
             loot.add(kingFlame());
         }
 
-        if (RANDOM.nextBoolean()) {
-            loot.add(randomArmorPiece());
+        if (rng.nextBoolean()) {
+            loot.add(randomArmorPiece(rng));
         }
         return loot;
     }
 
     public static List<Item> randomBagLoot() {
+        return randomBagLoot(null);
+    }
+
+    public static List<Item> randomBagLoot(Random random) {
+        Random rng = random != null ? random : DEFAULT_RANDOM;
         List<Item> loot = new ArrayList<>();
-        int roll = RANDOM.nextInt(100);
+        int roll = rng.nextInt(100);
         if (roll < 40) {
             loot.add(weakHealScroll());
         } else if (roll < 70) {
@@ -217,7 +237,7 @@ public class ItemFactory {
             loot.add(strongHealScroll());
         }
 
-        int manaRoll = RANDOM.nextInt(100);
+        int manaRoll = rng.nextInt(100);
         if (manaRoll < 40) {
             loot.add(smallManaPotion());
         } else if (manaRoll < 70) {
@@ -229,18 +249,24 @@ public class ItemFactory {
     }
 
     public static Item randomArmorPiece() {
-        int roll = RANDOM.nextInt(100);
+        return randomArmorPiece(null);
+    }
+
+    public static Item randomArmorPiece(Random random) {
+        Random rng = random != null ? random : DEFAULT_RANDOM;
+        int roll = rng.nextInt(100);
         if (roll < 40) {
-            return randomFromList(rogueArmorSet());
+            return randomFromList(rogueArmorSet(), rng);
         } else if (roll < 75) {
-            return randomFromList(midgardArmorSet());
+            return randomFromList(midgardArmorSet(), rng);
         } else {
-            return randomFromList(shadowArmorSet());
+            return randomFromList(shadowArmorSet(), rng);
         }
     }
 
-    private static Item randomFromList(List<Item> items) {
-        return items.get(RANDOM.nextInt(items.size()));
+    private static Item randomFromList(List<Item> items, Random random) {
+        Random rng = random != null ? random : DEFAULT_RANDOM;
+        return items.get(rng.nextInt(items.size()));
     }
 
     private static List<Item> rogueArmorSet() {
@@ -268,5 +294,34 @@ public class ItemFactory {
         list.add(shadowLegs());
         list.add(shadowBoots());
         return list;
+    }
+
+    public static Item fromId(String id) {
+        switch (id) {
+            case "scroll_heal_small": return weakHealScroll();
+            case "scroll_heal_medium": return healScroll();
+            case "scroll_heal_big": return strongHealScroll();
+            case "potion_mana_small": return smallManaPotion();
+            case "potion_mana_medium": return mediumManaPotion();
+            case "potion_mana_large": return largeManaPotion();
+            case "weapon_rogue": return rogueSword();
+            case "weapon_dark": return darkBlade();
+            case "weapon_flame": return kingFlame();
+            case "armor_rogue_helmet": return rogueHelmet();
+            case "armor_rogue_body": return rogueJacket();
+            case "armor_rogue_legs": return rogueLegs();
+            case "armor_rogue_boots": return rogueBoots();
+            case "armor_midgard_helmet": return midgardHelmet();
+            case "armor_midgard_body": return midgardArmor();
+            case "armor_midgard_legs": return midgardLegs();
+            case "armor_midgard_boots": return midgardBoots();
+            case "armor_shadow_helmet": return shadowHelmet();
+            case "armor_shadow_body": return shadowArmor();
+            case "armor_shadow_legs": return shadowLegs();
+            case "armor_shadow_boots": return shadowBoots();
+            case "key_boss": return bossKey();
+            default:
+                return null;
+        }
     }
 }

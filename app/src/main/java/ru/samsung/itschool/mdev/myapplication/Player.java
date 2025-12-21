@@ -18,10 +18,10 @@ public class Player {
 
     public Player() {
         this.maxHealth = 100;
-        this.health = 100;  // здоровье игрока
+        this.health = 100;
         this.maxMana = 50;
         this.mana = 50;
-        this.baseDamage = 10;   // базовый урон игрока
+        this.baseDamage = 10;
         this.baseDefense = 1;
         this.coins = 0;
         this.inventory = new java.util.ArrayList<>();
@@ -29,6 +29,10 @@ public class Player {
 
     public int getHealth() {
         return health;
+    }
+
+    public void setHealth(int health) {
+        this.health = Math.max(0, Math.min(health, maxHealth));
     }
 
     public int getDamage() {
@@ -83,6 +87,10 @@ public class Player {
         return mana;
     }
 
+    public void setMana(int mana) {
+        this.mana = Math.max(0, Math.min(mana, maxMana));
+    }
+
     public void spendMana(int amount) {
         mana -= amount;
         if (mana < 0) {
@@ -107,6 +115,10 @@ public class Player {
         return coins;
     }
 
+    public void setCoins(int coins) {
+        this.coins = Math.max(0, coins);
+    }
+
     public void addItem(Item item) {
         inventory.add(item);
     }
@@ -117,6 +129,14 @@ public class Player {
 
     public java.util.List<Item> getInventory() {
         return inventory;
+    }
+
+    public void setInventory(java.util.List<Item> inventory) {
+        this.inventory = inventory != null ? inventory : new java.util.ArrayList<>();
+    }
+
+    public void clearInventory() {
+        this.inventory.clear();
     }
 
     public void removeKeyItems() {
@@ -149,6 +169,26 @@ public class Player {
         return boots;
     }
 
+    public void setWeapon(Item weapon) {
+        this.weapon = weapon;
+    }
+
+    public void setHelmet(Item helmet) {
+        this.helmet = helmet;
+    }
+
+    public void setBody(Item body) {
+        this.body = body;
+    }
+
+    public void setLegs(Item legs) {
+        this.legs = legs;
+    }
+
+    public void setBoots(Item boots) {
+        this.boots = boots;
+    }
+
     public int getTotalDefense() {
         int defense = baseDefense;
         defense += helmet != null ? helmet.getDefenseBonus() : 0;
@@ -161,7 +201,6 @@ public class Player {
     public void equip(Item item) {
         if (item == null || item.getSlot() == Item.ItemSlot.NONE) return;
 
-        // снимаем текущий предмет и возвращаем в инвентарь
         switch (item.getSlot()) {
             case WEAPON:
                 if (weapon != null) {

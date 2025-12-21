@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Простая модель этажа с сеткой комнат.
- * Здесь генерируются комнаты, сундук с ключом и связи между соседями.
- */
 public class Floor {
 
     private final int index;
@@ -58,7 +54,6 @@ public class Floor {
             }
         }
 
-        // Связываем соседние комнаты
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 Room room = grid[y][x];
@@ -85,8 +80,11 @@ public class Floor {
         placeBoss();
     }
 
+    private Random createRandom(long salt) {
+        return new Random(index * 10_000L + salt);
+    }
+
     private boolean[][] getTemplateForFloor(int idx) {
-        // 5x5 сетка, true = есть комната
         switch (idx) {
             case 1:
                 return new boolean[][]{
@@ -144,20 +142,20 @@ public class Floor {
             return;
         }
 
-        Random random = new Random(index * 1234L);
+        Random random = createRandom(1_234L);
         Room keyRoom = candidates.get(random.nextInt(candidates.size()));
         keyRoom.setHasChest(true);
         keyRoom.setChestHasKey(true);
         int coins = 15 + random.nextInt(16);
         Container chest = new Container(Container.ContainerType.CHEST, coins, true);
-        for (Item item : ItemFactory.randomChestLoot()) {
+        Random lootRandom = createRandom(2_234L);
+        for (Item item : ItemFactory.randomChestLoot(lootRandom)) {
             chest.getItems().add(item);
         }
         keyRoom.setChestContainer(chest);
     }
 
     private void placeLootBags() {
-        // пара мешков с монетами для атмосферы
         List<Room> normalRooms = new ArrayList<>();
         for (Room[] row : grid) {
             for (Room room : row) {
@@ -166,7 +164,7 @@ public class Floor {
                 }
             }
         }
-        Random random = new Random(index * 4321L);
+        Random random = createRandom(4_321L);
         for (int i = 0; i < Math.min(3, normalRooms.size()); i++) {
             if (normalRooms.isEmpty()) {
                 break;
@@ -175,7 +173,8 @@ public class Floor {
             room.setHasLootBag(true);
             int coins = 5 + random.nextInt(8);
             Container bag = new Container(Container.ContainerType.LOOT_BAG, coins, false);
-            for (Item item : ItemFactory.randomBagLoot()) {
+            Random bagRandom = createRandom(5_000L + i);
+            for (Item item : ItemFactory.randomBagLoot(bagRandom)) {
                 bag.getItems().add(item);
             }
             room.setLootContainer(bag);
@@ -200,7 +199,7 @@ public class Floor {
 
             for (Room neighbor : new Room[]{room.getNorth(), room.getSouth(), room.getEast(), room.getWest()}) {
                 if (neighbor == null) continue;
-                if (neighbor.isBossRoom()) continue; // не заходим в комнату босса
+                if (neighbor.isBossRoom()) continue;
                 int ny = neighbor.getY();
                 int nx = neighbor.getX();
                 if (!visited[ny][nx]) {
@@ -224,7 +223,7 @@ public class Floor {
         }
 
         int enemyCount = Math.min(3 + index, normalRooms.size());
-        Random random = new Random(index * 2468L);
+        Random random = createRandom(2_468L);
         for (int i = 0; i < enemyCount; i++) {
             if (normalRooms.isEmpty()) {
                 break;
@@ -292,10 +291,10 @@ public class Floor {
         int coins = getMobCoinReward(random);
         Enemy mob = new Enemy(name, health, damage, coins, false);
         if (random.nextInt(100) < getMobConsumableChance()) {
-            mob.addLoot(ItemFactory.randomHealForFloor(index));
+            mob.addLoot(ItemFactory.randomHealForFloor(random, index));
         }
         if (random.nextInt(100) < getMobConsumableChance() / 2 + 20) {
-            mob.addLoot(ItemFactory.randomManaForFloor(index));
+            mob.addLoot(ItemFactory.randomManaForFloor(random, index));
         }
         return mob;
     }
@@ -325,9 +324,10 @@ public class Floor {
         } else {
             boss = new Enemy("Тёмный кардинал", 150, 24, 100, true);
         }
-        boss.addLoot(ItemFactory.randomBossReward(index));
-        boss.addLoot(ItemFactory.randomArmorForFloor(index));
-        boss.addLoot(ItemFactory.randomManaForFloor(index));
+        Random bossRandom = createRandom(9_876L);
+        boss.addLoot(ItemFactory.randomBossReward(bossRandom, index));
+        boss.addLoot(ItemFactory.randomArmorForFloor(bossRandom, index));
+        boss.addLoot(ItemFactory.randomManaForFloor(bossRandom, index));
         return boss;
     }
 
