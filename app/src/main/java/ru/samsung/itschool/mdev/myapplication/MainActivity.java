@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btnAttack;
     private Button btnMove;
     private Button btnInventory;
+    private Button btnOpen;
 
     private Button btnMoveForward;
     private Button btnMoveBack;
@@ -49,6 +50,16 @@ public class MainActivity extends AppCompatActivity {
     private TextView manaValue;
     private GridLayout minimapGrid;
     private GameEngine engine;
+    private LinearLayout inventoryList;
+    private TextView inventoryEmpty;
+    private TextView equipmentWeapon;
+    private TextView equipmentHelmet;
+    private TextView equipmentBody;
+    private TextView equipmentLegs;
+    private TextView equipmentBoots;
+    private TextView equipmentDamage;
+    private TextView equipmentDefense;
+    private TextView equipmentCoins;
 
     private UiMode currentMode = null;
 
@@ -84,12 +95,23 @@ public class MainActivity extends AppCompatActivity {
         hpValue = findViewById(R.id.hpValue);
         manaValue = findViewById(R.id.manaValue);
         minimapGrid = findViewById(R.id.minimapGrid);
+        inventoryList = findViewById(R.id.inventoryList);
+        inventoryEmpty = findViewById(R.id.inventoryEmpty);
+        equipmentWeapon = findViewById(R.id.equipmentWeapon);
+        equipmentHelmet = findViewById(R.id.equipmentHelmet);
+        equipmentBody = findViewById(R.id.equipmentBody);
+        equipmentLegs = findViewById(R.id.equipmentLegs);
+        equipmentBoots = findViewById(R.id.equipmentBoots);
+        equipmentDamage = findViewById(R.id.equipmentDamage);
+        equipmentDefense = findViewById(R.id.equipmentDefense);
+        equipmentCoins = findViewById(R.id.equipmentCoins);
 
         btnHelp = findViewById(R.id.btnHelp);
         btnLook = findViewById(R.id.btnLook);
         btnAttack = findViewById(R.id.btnAttack);
         btnMove = findViewById(R.id.btnMove);
         btnInventory = findViewById(R.id.btnInventory);
+        btnOpen = findViewById(R.id.btnOpen);
 
         btnMoveForward = findViewById(R.id.btnMoveForward);
         btnMoveBack = findViewById(R.id.btnMoveBack);
@@ -115,6 +137,10 @@ public class MainActivity extends AppCompatActivity {
             animateButtonPress(v);
             sendCommand("АТАКА", "attack");
         });
+        btnOpen.setOnClickListener(v -> {
+            animateButtonPress(v);
+            sendCommand("ОТКРЫТЬ", "open");
+        });
 
         btnMove.setOnClickListener(v -> {
             animateButtonPress(v);
@@ -124,9 +150,7 @@ public class MainActivity extends AppCompatActivity {
 
         btnInventory.setOnClickListener(v -> {
             animateButtonPress(v);
-            appendAction("ИНВЕНТАРЬ");
-            appendLog("Инвентарь пока не реализован");
-            renderMenu(UiMode.INVENTORY);
+            openInventoryMenu();
         });
 
         btnMoveForward.setOnClickListener(v -> {
@@ -211,6 +235,10 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        if (mode == UiMode.INVENTORY) {
+            refreshInventoryView();
+        }
+
         View newContainer = getContainerForMode(mode);
         View oldContainer = getContainerForMode(currentMode);
 
@@ -278,6 +306,103 @@ public class MainActivity extends AppCompatActivity {
         subtitleText.setText("Этаж " + floor.getIndex() + ": " + floor.getName());
 
         renderMinimap(engine.getCurrentFloorGrid());
+    }
+
+    private void refreshInventoryView() {
+        Player player = engine.getPlayer();
+        inventoryList.setOrientation(LinearLayout.HORIZONTAL);
+
+        Item weapon = player.getWeapon();
+        Item helmet = player.getHelmet();
+        Item body = player.getBody();
+        Item legs = player.getLegs();
+        Item boots = player.getBoots();
+
+        equipmentWeapon.setText("🗡 Оружие: " + (weapon != null ? weapon.getName() : "нет"));
+        equipmentHelmet.setText("🪖 Голова: " + (helmet != null ? helmet.getName() : "нет"));
+
+        String bodyEmoji = body != null && body.getId().contains("rogue") ? "🧥" : "🛡";
+        String bodyPrefix = body != null && body.getId().contains("rogue") ? "Куртка: " : "Доспех: ";
+        equipmentBody.setText(bodyEmoji + " Тело: " + (body != null ? bodyPrefix + body.getName() : "нет"));
+        equipmentLegs.setText("👖 Ноги: " + (legs != null ? legs.getName() : "нет"));
+        equipmentBoots.setText("🥾 Ботинки: " + (boots != null ? boots.getName() : "нет"));
+
+        equipmentDamage.setText("⚔ Урон: " + player.getTotalDamage());
+        equipmentDefense.setText("🛡 Защита: " + player.getTotalDefense());
+        equipmentCoins.setText("🪙 Монеты: " + player.getCoins());
+
+        inventoryList.removeAllViews();
+        if (player.getInventory().isEmpty()) {
+            inventoryEmpty.setVisibility(View.VISIBLE);
+            return;
+        }
+        inventoryEmpty.setVisibility(View.GONE);
+
+        for (Item item : player.getInventory()) {
+            LinearLayout row = new LinearLayout(this);
+            row.setOrientation(LinearLayout.VERTICAL);
+            row.setBackgroundResource(R.drawable.bg_panel);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.topMargin = dpToPx(6);
+            params.rightMargin = dpToPx(8);
+            row.setPadding(dpToPx(10), dpToPx(8), dpToPx(10), dpToPx(8));
+            row.setLayoutParams(params);
+            row.setMinimumWidth(dpToPx(180));
+
+            TextView title = new TextView(this);
+            title.setText(item.getEmoji() + " " + item.getName());
+            title.setTextSize(15f);
+            title.setTextColor(ContextCompat.getColor(this, R.color.arcane_text_primary));
+            row.addView(title);
+
+            TextView desc = new TextView(this);
+            desc.setText(item.getDescription());
+            desc.setTextSize(13f);
+            desc.setTextColor(ContextCompat.getColor(this, R.color.arcane_text_secondary));
+            desc.setPadding(0, dpToPx(2), 0, dpToPx(6));
+            row.addView(desc);
+
+            Button action = new Button(this);
+            action.setBackgroundResource(R.drawable.bg_button_arcane);
+            action.setTextColor(ContextCompat.getColor(this, R.color.arcane_text_primary));
+            action.setText(getActionLabel(item));
+            action.setOnClickListener(v -> {
+                animateButtonPress(v);
+                handleItemAction(item);
+            });
+            row.addView(action);
+
+            inventoryList.addView(row);
+        }
+    }
+
+    private String getActionLabel(Item item) {
+        if (item.isConsumable()) {
+            return "ИСПОЛЬЗОВАТЬ";
+        }
+        if (item.isArmor() || item.isWeapon()) {
+            return "ЭКИПИРОВАТЬ";
+        }
+        if (item.getType() == Item.ItemType.KEY) {
+            return "КЛЮЧ";
+        }
+        return "ПРЕДМЕТ";
+    }
+
+    private void handleItemAction(Item item) {
+        appendAction("ИНВЕНТАРЬ");
+        String result = engine.useItem(item);
+        appendLog(result + " " + engine.getPlayerStats());
+        updateUiFromEngine();
+        refreshInventoryView();
+    }
+
+    private void openInventoryMenu() {
+        appendAction("ИНВЕНТАРЬ");
+        renderMenu(UiMode.INVENTORY);
+        refreshInventoryView();
     }
 
     private void renderMinimap(Room[][] grid) {

@@ -147,6 +147,12 @@ public class Floor {
         Room keyRoom = candidates.get(random.nextInt(candidates.size()));
         keyRoom.setHasChest(true);
         keyRoom.setChestHasKey(true);
+        int coins = 15 + random.nextInt(16);
+        Container chest = new Container(Container.ContainerType.CHEST, coins, true);
+        for (Item item : ItemFactory.randomChestLoot()) {
+            chest.getItems().add(item);
+        }
+        keyRoom.setChestContainer(chest);
     }
 
     private void placeLootBags() {
@@ -166,6 +172,12 @@ public class Floor {
             }
             Room room = normalRooms.remove(random.nextInt(normalRooms.size()));
             room.setHasLootBag(true);
+            int coins = 5 + random.nextInt(8);
+            Container bag = new Container(Container.ContainerType.LOOT_BAG, coins, false);
+            for (Item item : ItemFactory.randomBagLoot()) {
+                bag.getItems().add(item);
+            }
+            room.setLootContainer(bag);
         }
     }
 

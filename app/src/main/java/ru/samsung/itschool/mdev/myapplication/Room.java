@@ -27,6 +27,8 @@ public class Room {
     private boolean hasLootBag;
     private boolean lootCollected;
     private boolean bossRevealed;
+    private Container chestContainer;
+    private Container lootContainer;
 
     public Room(String description) {
         this.description = description;
@@ -148,5 +150,21 @@ public class Room {
 
     public void setBossRevealed(boolean bossRevealed) {
         this.bossRevealed = bossRevealed;
+    }
+
+    public Container getChestContainer() {
+        return chestContainer;
+    }
+
+    public void setChestContainer(Container chestContainer) {
+        this.chestContainer = chestContainer;
+    }
+
+    public Container getLootContainer() {
+        return lootContainer;
+    }
+
+    public void setLootContainer(Container lootContainer) {
+        this.lootContainer = lootContainer;
     }
 }
