@@ -456,160 +456,164 @@
         </LinearLayout>
 
         <!-- Меню инвентаря -->
-        <LinearLayout
-            android:id="@+id/inventoryMenuContainer"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
+            android:fillViewport="true">
 
             <LinearLayout
+                android:id="@+id/inventoryMenuContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_panel"
                 android:orientation="vertical"
-                android:padding="12dp"
-                android:layout_marginBottom="8dp">
+                android:visibility="gone">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Экипировка"
-                    android:textColor="@color/arcane_text_secondary"
-                    android:textStyle="bold"
-                    android:textSize="14sp"
-                    android:letterSpacing="0.02"
-                    android:paddingBottom="4dp" />
-
-                <TextView
-                    android:id="@+id/equipmentWeapon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🗡 Оружие: нет"
-                    android:textColor="@color/arcane_text_primary"
-                    android:textSize="14sp"
-                    android:paddingBottom="2dp" />
-
-                <TextView
-                    android:id="@+id/equipmentHelmet"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🪖 Голова: нет"
-                    android:textColor="@color/arcane_text_primary"
-                    android:textSize="14sp"
-                    android:paddingBottom="2dp" />
-
-                <TextView
-                    android:id="@+id/equipmentBody"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🧥 Тело: нет"
-                    android:textColor="@color/arcane_text_primary"
-                    android:textSize="14sp"
-                    android:paddingBottom="2dp" />
-
-                <TextView
-                    android:id="@+id/equipmentLegs"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="👖 Ноги: нет"
-                    android:textColor="@color/arcane_text_primary"
-                    android:textSize="14sp"
-                    android:paddingBottom="2dp" />
-
-                <TextView
-                    android:id="@+id/equipmentBoots"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🥾 Ботинки: нет"
-                    android:textColor="@color/arcane_text_primary"
-                    android:textSize="14sp"
-                    android:paddingBottom="8dp" />
-
-                <View
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/arcane_divider"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:id="@+id/equipmentDamage"
-                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="⚔ Урон: 0"
-                    android:textColor="@color/arcane_text_secondary"
-                    android:textSize="14sp"
-                    android:paddingBottom="2dp" />
+                    android:background="@drawable/bg_panel"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:layout_marginBottom="8dp">
 
-                <TextView
-                    android:id="@+id/equipmentDefense"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🛡 Защита: 0"
-                    android:textColor="@color/arcane_text_secondary"
-                    android:textSize="14sp"
-                    android:paddingBottom="2dp" />
-
-                <TextView
-                    android:id="@+id/equipmentCoins"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🪙 Монеты: 0"
-                    android:textColor="@color/arcane_text_secondary"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_panel"
-                android:orientation="vertical"
-                android:padding="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Инвентарь"
-                    android:textColor="@color/arcane_text_secondary"
-                    android:textStyle="bold"
-                    android:textSize="14sp"
-                    android:letterSpacing="0.02"
-                    android:paddingBottom="6dp" />
-
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:fillViewport="true"
-                    android:scrollbars="none">
-
-                    <LinearLayout
-                        android:id="@+id/inventoryList"
+                    <TextView
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal" />
-                </HorizontalScrollView>
+                        android:layout_height="wrap_content"
+                        android:text="Экипировка"
+                        android:textColor="@color/arcane_text_secondary"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:letterSpacing="0.02"
+                        android:paddingBottom="4dp" />
 
-                <TextView
-                    android:id="@+id/inventoryEmpty"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:id="@+id/equipmentWeapon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🗡 Оружие: нет"
+                        android:textColor="@color/arcane_text_primary"
+                        android:textSize="14sp"
+                        android:paddingBottom="2dp" />
+
+                    <TextView
+                        android:id="@+id/equipmentHelmet"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🪖 Голова: нет"
+                        android:textColor="@color/arcane_text_primary"
+                        android:textSize="14sp"
+                        android:paddingBottom="2dp" />
+
+                    <TextView
+                        android:id="@+id/equipmentBody"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🧥 Тело: нет"
+                        android:textColor="@color/arcane_text_primary"
+                        android:textSize="14sp"
+                        android:paddingBottom="2dp" />
+
+                    <TextView
+                        android:id="@+id/equipmentLegs"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="👖 Ноги: нет"
+                        android:textColor="@color/arcane_text_primary"
+                        android:textSize="14sp"
+                        android:paddingBottom="2dp" />
+
+                    <TextView
+                        android:id="@+id/equipmentBoots"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🥾 Ботинки: нет"
+                        android:textColor="@color/arcane_text_primary"
+                        android:textSize="14sp"
+                        android:paddingBottom="8dp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/arcane_divider"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/equipmentDamage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⚔ Урон: 0"
+                        android:textColor="@color/arcane_text_secondary"
+                        android:textSize="14sp"
+                        android:paddingBottom="2dp" />
+
+                    <TextView
+                        android:id="@+id/equipmentDefense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🛡 Защита: 0"
+                        android:textColor="@color/arcane_text_secondary"
+                        android:textSize="14sp"
+                        android:paddingBottom="2dp" />
+
+                    <TextView
+                        android:id="@+id/equipmentCoins"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🪙 Монеты: 0"
+                        android:textColor="@color/arcane_text_secondary"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_panel"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Инвентарь"
+                        android:textColor="@color/arcane_text_secondary"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:letterSpacing="0.02"
+                        android:paddingBottom="6dp" />
+
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fillViewport="true"
+                        android:scrollbars="none">
+
+                        <LinearLayout
+                            android:id="@+id/inventoryList"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal" />
+                    </HorizontalScrollView>
+
+                    <TextView
+                        android:id="@+id/inventoryEmpty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Рюкзак пуст."
+                        android:textColor="@color/arcane_text_secondary"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnInventoryBack"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Рюкзак пуст."
-                    android:textColor="@color/arcane_text_secondary"
-                    android:textSize="13sp" />
+                    android:background="@drawable/bg_button_arcane"
+                    android:text="ВЕРНУТЬСЯ"
+                    android:textColor="@color/arcane_text_primary" />
             </LinearLayout>
-
-            <Button
-                android:id="@+id/btnInventoryBack"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_button_arcane"
-                android:text="ВЕРНУТЬСЯ"
-                android:textColor="@color/arcane_text_primary" />
-        </LinearLayout>
+        </ScrollView>
 
     </LinearLayout>
 
